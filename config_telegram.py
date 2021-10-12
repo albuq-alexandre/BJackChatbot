@@ -17,12 +17,6 @@ TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 PORT = int(os.environ.get('PORT', '8443'))
 WEBHOOK_URL = os.environ.get('TELEGRAM_WEBHOOK')
 
-#se o webhook for local, inicia o ngrok
-if WEBHOOK_URL == 'https://127.0.0.1':
-    https_tunnel = ngrok.connect(bind_tls=True)
-    WEBHOOK_URL = https_tunnel.public_url
-
-listen_url = WEBHOOK_URL.replace('https://', '')
 
 #configura logging e config
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -52,13 +46,13 @@ def setup():
     #inicia webhook com a porta configurada pelo heroku
     #o heroku cuida automaticamente do proxy reverso, portanto a porta deve ser a fornecida pelo heroku
     #nas variáveis de ambiente
-    updater.start_webhook(listen=listen_url,
+    updater.start_webhook(listen='0.0.0.0',
                              port=PORT,
                              url_path=TOKEN)
 
     #configura webhook
     updater.bot.set_webhook(WEBHOOK_URL + '/' + TOKEN)
-    
+
 
     #para a aplicacao nao terminar, eh necessario chamar o idle para que ela fique sempre rodando
     updater.idle()
