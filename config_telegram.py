@@ -7,10 +7,8 @@ import os
 import assistant
 import voice
 import os
-from pyngrok import ngrok
-
-
 import logging
+
 
 #Variaveis de ambiente de configuracao
 TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
@@ -52,7 +50,6 @@ def setup():
 
     #configura webhook
     updater.bot.set_webhook(WEBHOOK_URL + '/' + TOKEN)
-
 
     #para a aplicacao nao terminar, eh necessario chamar o idle para que ela fique sempre rodando
     updater.idle()
