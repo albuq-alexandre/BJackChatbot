@@ -1,0 +1,4 @@
+ibm-watson
+python-telegram-bot
+requests
+Pillow
