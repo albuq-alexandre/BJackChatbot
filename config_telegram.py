@@ -38,8 +38,8 @@ def setup():
     voice_handler = MessageHandler(Filters.voice, receive_voice)
     dispatcher.add_handler(voice_handler)
 
-    image_handler = MessageHandler(Filters.photo, imagem)
-    dispatcher.add_handler(image_handler)
+    # image_handler = MessageHandler(Filters.photo, imagem)
+    # dispatcher.add_handler(image_handler)
 
     #inicia webhook com a porta configurada pelo heroku
     #o heroku cuida automaticamente do proxy reverso, portanto a porta deve ser a fornecida pelo heroku
@@ -50,7 +50,7 @@ def setup():
                             webhook_url=WEBHOOK_URL + '/' + TOKEN)
 
     #configura webhook
-    updater.bot.set_webhook(WEBHOOK_URL + '/' + TOKEN)
+    # updater.bot.set_webhook(WEBHOOK_URL + '/' + TOKEN)
 
     #para a aplicacao nao terminar, eh necessario chamar o idle para que ela fique sempre rodando
     updater.idle()
@@ -78,7 +78,7 @@ def receive_voice(update, context):
     response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), text)
     context.bot.send_voice(chat_id=update.effective_chat.id, voice=voice.convert_text(response_text))
 
-def imagem(update, context):
-    assistant.validate_session(update.effective_chat.id)
-    response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), update.message.text)
-    context.bot.send_photo(chat_id=update.effective_chat.id, photo=response_text)
+# def imagem(update, context):
+#     assistant.validate_session(update.effective_chat.id)
+#     response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), update.message.text)
+#     context.bot.send_photo(chat_id=update.effective_chat.id, photo=response_text)

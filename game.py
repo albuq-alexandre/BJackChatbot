@@ -38,8 +38,8 @@ class Player:
 
     def show_hand(self, text = False):
         count = len(self.hand)
-        imgs_loader = [Image.open(requests.get(card['image'], stream=True).raw).convert("RGB") for card in self.hand]
-        card_labels = [self.get_value(card_value=card['value']) for card in self.hand]
+        imgs_loader = [Image.open(requests.get(card[0]['image'], stream=True).raw).convert("RGB") for card in self.hand]
+        card_labels = [self.get_value(card_value=card[0]['value']) for card in self.hand]
         score = str(self.get_game_score())
         if self.name == 'Dealer':
             imgs_loader[-1] = Image.open('b0C.png').convert("RGB")
@@ -54,9 +54,12 @@ class Player:
             plt.imshow(imgs_loader[idx])
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
-        ret = base64.encodebytes(buf).decode('utf-8')
+        ret = base64.b64encode(buf.read()).decode('utf-8')
         if text:
-            ret = " ".join(card['code'] for card in self.hand)
+            card_codes = [card[0]['code'] for card in self.hand]
+            if self.name == 'Dealer':
+                card_codes[-1] = '?'
+            ret = " ".join(card for card in card_codes)
         return ret
 
     def set_game_score(self, card_code):
@@ -65,9 +68,9 @@ class Player:
         else:
             self.game_score += self.get_value(card_code)
 
-    def get_value(card_value = None):
+    def get_value(self, card_value = None):
         values = {"2": 2,  "3": 3 , "4":4, "5":5,
-                  "6":6, "7": 7,"8": 8, "9" : 9, "0": 10,
+                  "6":6, "7": 7,"8": 8, "9" : 9, "10": 10,
                   "JACK": 10, "QUEEN": 10, "KING": 10, "ACE": 11}
         return values[card_value]
 
@@ -99,7 +102,7 @@ class Player:
     def draw_from_deck(self, deck:Deck()):
         card = deck.draw_a_card(1)
         self.hand.append(card)
-        self.set_game_score(card['value'])
+        self.set_game_score(card[0]['value'])
 
     def busted(self):
         return self.get_game_score() > 21

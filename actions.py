@@ -23,7 +23,7 @@ def action_handler(action, parameters, return_var):
     return {
             'skills': {
                 'main skill': {
-                    'user_defined': return_values
+                    'user_defined': { return_var: return_values}
                 }
             }
         }
