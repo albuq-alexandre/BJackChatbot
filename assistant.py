@@ -4,6 +4,7 @@ from session_manager import SessionManager
 import os
 import logging
 import actions
+from game import BlackJackGame
 
 IAM_TOKEN = os.environ.get('WATSON_ASSISTANT_TOKEN')
 ASSISTANT_URL = os.environ.get('WATSON_ASSISTANT_URL')
@@ -20,6 +21,8 @@ assistant = AssistantV2(
 )
 
 assistant.set_service_url(ASSISTANT_URL)
+
+game = BlackJackGame()
 
 def create_session():
     response = assistant.create_session(assistant_id)
@@ -43,7 +46,7 @@ def execute_action(session_id, response):
         action = response['output']['actions'][0]
         logger.info('Executando ação ' + action['name'])
         #executa a ação correta e recebe dados em um dicionario
-        result_data = actions.action_handler(action['name'], action['parameters'], action['result_variable'])
+        result_data = actions.action_handler(action['name'], action['parameters'], action['result_variable'], game)
         #envia dados de resposta como contexto para o Watson Assistant
         response = assistant.message(
             assistant_id=assistant_id,

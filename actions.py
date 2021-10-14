@@ -1,12 +1,8 @@
-from game import BlackJackGame
 
-
-def action_handler(action, parameters, return_var):
+def action_handler(action, parameters, return_var, game):
     return_values = {}
-    game = None
     if action == 'iniciar':
-        if not game:
-            game = BlackJackGame()
+
         return_values = game.start()
 
     elif action == 'mais1carta':
