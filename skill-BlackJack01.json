@@ -11,6 +11,9 @@
         },
         {
           "text": "Quero ver as estatísticas"
+        },
+        {
+          "text": "stats"
         }
       ],
       "description": ""
@@ -28,6 +31,9 @@
           "text": "Até logo"
         },
         {
+          "text": "cancelar"
+        },
+        {
           "text": "Tchau"
         }
       ],
@@ -36,6 +42,9 @@
     {
       "intent": "iniciar",
       "examples": [
+        {
+          "text": "bora"
+        },
         {
           "text": "Bora jogar"
         },
@@ -62,31 +71,57 @@
         }
       ],
       "description": ""
-    }
-  ],
-  "entities": [
+    },
     {
-      "entity": "acao",
-      "values": [
+      "intent": "parar",
+      "examples": [
         {
-          "type": "synonyms",
-          "value": "iniciar",
-          "synonyms": []
+          "text": "chega"
         },
         {
-          "type": "synonyms",
-          "value": "maiscarta",
-          "synonyms": []
+          "text": "não"
         },
         {
-          "type": "synonyms",
-          "value": "parar",
-          "synonyms": []
+          "text": "parar"
+        },
+        {
+          "text": "parei"
         }
       ],
-      "fuzzy_match": true
+      "description": "Para de pegar cartas"
+    },
+    {
+      "intent": "pegar_carta",
+      "examples": [
+        {
+          "text": "carta"
+        },
+        {
+          "text": "continuar"
+        },
+        {
+          "text": "desce"
+        },
+        {
+          "text": "mais"
+        },
+        {
+          "text": "Mais 1 carta"
+        },
+        {
+          "text": "mais1 carta"
+        },
+        {
+          "text": "mais uma"
+        },
+        {
+          "text": "manda"
+        }
+      ],
+      "description": "Pega mais 1 carta do Baralho"
     }
   ],
+  "entities": [],
   "metadata": {
     "api_version": {
       "major_version": "v2",
@@ -129,13 +164,13 @@
           {
             "values": [
               {
-                "text": "Eu não entendi. Você pode tentar reformular a frase."
+                "text": "Eu não entendi. Você pode tentar reformular a frase. Vamos Jogar BlackJack?"
               },
               {
-                "text": "Você pode reformular sua afirmação? Eu não estou entendendo."
+                "text": "Você pode reformular sua afirmação? Eu não estou entendendo. Vamos Jogar BlackJack?"
               },
               {
-                "text": "Eu não entendi o sentido."
+                "text": "Eu não entendi o sentido. Vamos Jogar BlackJack?"
               }
             ],
             "response_type": "text",
@@ -149,111 +184,145 @@
       "disambiguation_opt_out": true
     },
     {
-      "type": "standard",
-      "parent": "node_1_1633894261400",
-      "actions": [
-        {
-          "name": "main_webhook",
-          "type": "webhook",
-          "parameters": {
-            "acao": "mais1carta"
-          },
-          "result_variable": "webhook_result_1"
-        }
-      ],
-      "metadata": {
-        "_customization": {
-          "mcr": true
-        }
-      },
-      "next_step": {
-        "behavior": "jump_to",
-        "selector": "body",
-        "dialog_node": "node_5_1633896142692"
-      },
-      "conditions": "@acao:maiscarta",
-      "dialog_node": "node_10_1633894932948"
-    },
-    {
-      "type": "standard",
-      "actions": [
-        {
-          "name": "main_webhook",
-          "type": "webhook",
-          "parameters": {
-            "acao": "iniciar"
-          },
-          "result_variable": "webhook_result_1"
-        }
-      ],
-      "metadata": {
-        "_customization": {
-          "mcr": true
-        }
-      },
-      "next_step": {
-        "behavior": "jump_to",
-        "selector": "body",
-        "dialog_node": "node_5_1633896142692"
-      },
-      "conditions": "#iniciar",
-      "dialog_node": "node_1_1633891198603",
-      "previous_sibling": "Bem-vindo"
-    },
-    {
-      "type": "standard",
-      "title": "#opcoesJogador",
+      "type": "event_handler",
       "output": {
         "generic": [
           {
-            "title": "O que você quer fazer?",
-            "options": [
+            "values": [
               {
-                "label": "Mais 1 carta",
-                "value": {
-                  "input": {
-                    "text": "\"maiscarta\""
-                  }
-                }
-              },
-              {
-                "label": "Parar",
-                "value": {
-                  "input": {
-                    "text": "\"parar\""
-                  }
-                }
+                "text": "Ok! Até mais!"
               }
             ],
-            "response_type": "option"
+            "response_type": "text"
+          }
+        ]
+      },
+      "parent": "node_7_1634092247414",
+      "context": {
+        "jogo_iniciado": null
+      },
+      "conditions": "#finalizacao",
+      "event_name": "generic",
+      "dialog_node": "handler_1_1634178476000"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Jogo já iniciado"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_1_1633891198603",
+      "conditions": "@jogo_iniciado:Verdadeiro",
+      "event_name": "generic",
+      "dialog_node": "handler_4_1634172113702",
+      "previous_sibling": "node_1_1634420944813"
+    },
+    {
+      "type": "standard",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Jogo Parado. Peça para jogar novamente."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_3_1634168515135",
+      "context": {
+        "jogo_iniciado": null
+      },
+      "conditions": "true",
+      "dialog_node": "node_10_1634421142756"
+    },
+    {
+      "type": "standard",
+      "title": "nó iniciar",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Distribuindo cartas..."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "iniciar",
+          "type": "client",
+          "parameters": {
+            "acao": "iniciar"
+          },
+          "result_variable": "resposta"
+        }
+      ],
+      "context": {
+        "resposta": null,
+        "jogo_iniciado": "True"
+      },
+      "metadata": {
+        "_customization": {
+          "mcr": false
+        }
+      },
+      "next_step": {
+        "behavior": "skip_user_input"
+      },
+      "conditions": "#iniciar",
+      "dialog_node": "node_1_1633891198603",
+      "previous_sibling": "Bem-vindo",
+      "disambiguation_opt_out": true
+    },
+    {
+      "type": "standard",
+      "metadata": {
+        "_customization": {
+          "mcr": true
+        }
+      },
+      "next_step": {
+        "behavior": "skip_user_input"
+      },
+      "conditions": "#estatisticas",
+      "dialog_node": "node_1_1633897772852",
+      "previous_sibling": "node_7_1634092247414"
+    },
+    {
+      "type": "standard",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "$resposta"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
           }
         ]
       },
       "parent": "node_1_1633891198603",
       "conditions": "true",
-      "dialog_node": "node_1_1633894261400",
-      "previous_sibling": "node_5_1633896142692"
-    },
-    {
-      "type": "standard",
-      "actions": [
-        {
-          "name": "main_webhook",
-          "type": "webhook",
-          "parameters": {
-            "acao": "estatistica"
-          },
-          "result_variable": "webhook_result_1"
-        }
-      ],
-      "metadata": {
-        "_customization": {
-          "mcr": true
-        }
-      },
-      "conditions": "#estatisticas",
-      "dialog_node": "node_1_1633897772852",
-      "previous_sibling": "node_1_1633891198603"
+      "dialog_node": "node_1_1634420944813"
     },
     {
       "type": "standard",
@@ -276,6 +345,11 @@
           }
         ]
       },
+      "context": {
+        "cancelar": true,
+        "resposta": null,
+        "jogo_iniciado": null
+      },
       "conditions": "#finalizacao",
       "digress_in": "does_not_return",
       "dialog_node": "node_3_1633890969249",
@@ -283,68 +357,29 @@
     },
     {
       "type": "standard",
-      "title": "#jogada",
-      "output": {
-        "generic": []
-      },
-      "parent": "node_1_1633891198603",
-      "next_step": {
-        "behavior": "jump_to",
-        "selector": "body",
-        "dialog_node": "node_1_1633894261400"
-      },
-      "conditions": "true",
-      "dialog_node": "node_5_1633896142692"
-    },
-    {
-      "type": "standard",
-      "parent": "node_1_1633894261400",
-      "actions": [
-        {
-          "name": "main_webhook",
-          "type": "webhook",
-          "parameters": {
-            "acao": "parar"
-          },
-          "result_variable": "webhook_result_1"
-        }
-      ],
+      "title": "nó parar",
       "metadata": {
         "_customization": {
           "mcr": true
         }
       },
       "next_step": {
-        "behavior": "jump_to",
-        "selector": "body",
-        "dialog_node": "Bem-vindo"
+        "behavior": "skip_user_input"
       },
-      "conditions": "@acao:parar",
-      "dialog_node": "node_7_1633896410664",
-      "previous_sibling": "node_10_1633894932948"
+      "conditions": "#parar",
+      "digress_in": "does_not_return",
+      "dialog_node": "node_3_1634168515135",
+      "previous_sibling": "node_1_1633891198603"
     },
     {
-      "type": "response_condition",
-      "parent": "node_10_1633894932948",
-      "conditions": "anything_else",
-      "dialog_node": "response_10_1633894992575",
-      "previous_sibling": "response_5_1633894990816"
-    },
-    {
-      "type": "response_condition",
-      "parent": "node_1_1633891198603",
-      "conditions": "anything_else",
-      "dialog_node": "response_5_1633891897863",
-      "previous_sibling": "response_7_1633895828352"
-    },
-    {
-      "type": "response_condition",
+      "type": "standard",
+      "title": "nó pegar carta",
       "output": {
         "generic": [
           {
             "values": [
               {
-                "text": "<?$webhook_result_1.resposta?>"
+                "text": "$resposta \\npc"
               }
             ],
             "response_type": "text",
@@ -352,64 +387,25 @@
           }
         ]
       },
-      "parent": "node_10_1633894932948",
-      "conditions": "$webhook_result_1",
-      "dialog_node": "response_5_1633894990816"
-    },
-    {
-      "type": "response_condition",
-      "output": {
-        "generic": [
-          {
-            "values": [
-              {
-                "text": "<?$webhook_result_1.resposta?>"
-              }
-            ],
-            "response_type": "text",
-            "selection_policy": "sequential"
-          }
-        ]
+      "parent": "node_7_1634092247414",
+      "context": {},
+      "metadata": {
+        "_customization": {
+          "mcr": false
+        }
       },
-      "parent": "node_7_1633896410664",
-      "conditions": "$webhook_result_1",
-      "dialog_node": "response_5_1633896523337"
+      "conditions": "true",
+      "dialog_node": "node_6_1634168671047",
+      "previous_sibling": "handler_1_1634178476000"
     },
     {
-      "type": "response_condition",
+      "type": "standard",
       "output": {
         "generic": [
           {
             "values": [
               {
-                "text": "<?$webhook_result_1.resposta?>"
-              }
-            ],
-            "response_type": "text",
-            "selection_policy": "sequential"
-          }
-        ]
-      },
-      "parent": "node_1_1633891198603",
-      "conditions": "$webhook_result_1",
-      "dialog_node": "response_7_1633895828352",
-      "previous_sibling": "node_1_1633894261400"
-    },
-    {
-      "type": "response_condition",
-      "parent": "node_7_1633896410664",
-      "conditions": "anything_else",
-      "dialog_node": "response_9_1633896525308",
-      "previous_sibling": "response_5_1633896523337"
-    },
-    {
-      "type": "response_condition",
-      "output": {
-        "generic": [
-          {
-            "values": [
-              {
-                "text": "<?$webhook_result_1.resposta?>"
+                "text": "R stats $resposta"
               }
             ],
             "response_type": "text",
@@ -418,18 +414,264 @@
         ]
       },
       "parent": "node_1_1633897772852",
-      "conditions": "$webhook_result_1",
-      "dialog_node": "response_9_1633897788691"
+      "conditions": "true",
+      "dialog_node": "node_6_1634422155526"
+    },
+    {
+      "type": "frame",
+      "title": "nó jogar blackjack pegar carta",
+      "metadata": {
+        "_customization": {
+          "mcr": true
+        }
+      },
+      "next_step": {
+        "behavior": "skip_user_input"
+      },
+      "conditions": "#pegar_carta",
+      "dialog_node": "node_7_1634092247414",
+      "previous_sibling": "node_3_1634168515135",
+      "disambiguation_opt_out": true
     },
     {
       "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Resposta iniciar: $resposta"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_1_1633891198603",
+      "actions": [
+        {
+          "name": "iniciar",
+          "type": "client",
+          "parameters": {
+            "acao": "iniciar"
+          },
+          "result_variable": "resposta"
+        }
+      ],
+      "context": {
+        "jogo_iniciado": "True"
+      },
+      "disabled": true,
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "node_7_1634092247414"
+      },
+      "conditions": "true",
+      "dialog_node": "response_2_1634087395540",
+      "previous_sibling": "handler_4_1634172113702"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "R: $text\\nMais uma carta ou Parar?"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_6_1634168671047",
+      "actions": [
+        {
+          "name": "mais1carta",
+          "type": "client",
+          "parameters": {
+            "acao": "mais1carta"
+          },
+          "result_variable": "resposta"
+        }
+      ],
+      "context": {
+        "acao": "'mais1carta'"
+      },
+      "disabled": true,
+      "conditions": "true",
+      "dialog_node": "response_2_1634175831827"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "O jogo parece não estar iniciado. \\n Não consigo dar cartas à você."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_7_1634092247414",
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "user_input",
+        "dialog_node": "Bem-vindo"
+      },
+      "conditions": "anything_else",
+      "dialog_node": "response_2_1634421819180",
+      "previous_sibling": "response_8_1634092365530"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Parando Jogo..."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_3_1634168515135",
+      "actions": [
+        {
+          "name": "parar",
+          "type": "client",
+          "parameters": {
+            "acao": "parar"
+          },
+          "result_variable": "resposta"
+        }
+      ],
+      "context": {
+        "resposta": null
+      },
+      "conditions": "$jogo_iniciado",
+      "dialog_node": "response_4_1634174604134",
+      "previous_sibling": "node_10_1634421142756"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Pegando carta..."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_7_1634092247414",
+      "actions": [
+        {
+          "name": "mais1carta",
+          "type": "client",
+          "parameters": {
+            "acao": "mais1carta"
+          },
+          "result_variable": "resposta"
+        }
+      ],
+      "context": {
+        "resposta": null
+      },
+      "conditions": "$jogo_iniciado",
+      "dialog_node": "response_8_1634092365530",
+      "previous_sibling": "node_6_1634168671047"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Parece que o jogo não iniciou..."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_3_1634168515135",
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "user_input",
+        "dialog_node": "Bem-vindo"
+      },
+      "conditions": "anything_else",
+      "dialog_node": "response_8_1634176188055",
+      "previous_sibling": "response_4_1634174604134"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "actions": [
+          {
+            "name": "estatística",
+            "type": "client",
+            "parameters": {
+              "acao": "estatística"
+            },
+            "result_variable": "resposta"
+          }
+        ],
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Estatísticas da partida:"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_1_1633897772852",
+      "conditions": "$jogo_iniciado",
+      "dialog_node": "response_9_1633897788691",
+      "previous_sibling": "node_6_1634422155526"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "text": {
+          "values": [
+            "stats Parece que a partida ainda não iniciou. Vamos Jogar Blackjack?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
       "parent": "node_1_1633897772852",
       "conditions": "anything_else",
       "dialog_node": "response_9_1633897790809",
       "previous_sibling": "response_9_1633897788691"
     }
   ],
-  "counterexamples": [],
+  "counterexamples": [
+    {
+      "text": "o que vc faz"
+    }
+  ],
   "system_settings": {
     "disambiguation": {
       "prompt": "Você quis dizer:",

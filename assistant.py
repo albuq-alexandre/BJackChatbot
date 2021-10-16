@@ -48,6 +48,7 @@ def execute_action(session_id, response):
         #executa a ação correta e recebe dados em um dicionario
         result_data = actions.action_handler(action['name'], action['parameters'], action['result_variable'], game)
         #envia dados de resposta como contexto para o Watson Assistant
+        logger.info(result_data)
         response = assistant.message(
             assistant_id=assistant_id,
             session_id=session_id,
@@ -69,5 +70,7 @@ def send_message(session_id, message):
     result = response.get_result()
     logger.info(result)
     result = execute_action(session_id, result)
+    logger.info("apos execute action" )
+    logger.info(result)
     logger.info('Recebido do assistant: ' + result['output']['generic'][0]['text'])
     return result['output']['generic'][0]['text']

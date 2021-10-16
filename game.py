@@ -105,7 +105,8 @@ class Player:
         self.set_game_score(card[0]['value'])
 
     def busted(self):
-        return self.get_game_score() > 21
+        score = self.get_game_score()
+        return score > 21
 
     def new_hand(self):
         self.game_score = 0
@@ -157,7 +158,7 @@ class BlackJackGame:
             player.draw_from_deck(self.deck)
         self._current_player = 1
 
-        resp = "\n".join(player.name +":"+ player.show_hand(text=True) for player in self.players)
+        resp = "Cartas na mesa: \n" + "\n".join(player.name +": "+ player.show_hand(text=True) for player in self.players)
 
         return resp
 
@@ -175,6 +176,9 @@ class BlackJackGame:
                     player.turn_over = True
                     self._current_player = 0
                     self.dealers_turn()
+        resp = "Cartas na mesa: \n" + "\n".join(player.name +": "+ player.show_hand(text=True) for player in self.players)
+
+        return resp
 
     def dealers_turn(self):
         if not self.running:
@@ -243,7 +247,23 @@ class BlackJackGame:
                 elif player.get_game_score() < self.dealer.get_game_score():
                     player.matches.append(player.get_game_score())
                     ret = f'Você perdeu!\nVocê: {player.get_game_score()} pontos.\nDealer: {self.dealer.get_game_score()} pontos.'
+
+        ret = ret + '\n' + self.players[1].stats()
+
         return ret
+
+    def terminate (self):
+        #return to same state as a new instance of BlackJackGame
+        self.list_won = []
+        self.list_tie = []
+        self.list_lost = []
+        self._current_player = 0
+        self.players = []
+        self.running = False
+        self.dealer = Player("Dealer")
+        self.players.append(self.dealer)
+        self.players.append(Player("Você"))
+        self.deck = Deck()
 
 def generate_bar_chart(win_percentage):
     """
