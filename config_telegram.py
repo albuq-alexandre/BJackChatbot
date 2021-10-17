@@ -1,3 +1,4 @@
+import telegram
 from telegram.ext import Updater, Dispatcher, CommandHandler, MessageHandler, Filters
 from session_manager import SessionManager
 from io import BytesIO
@@ -75,7 +76,7 @@ def message(update, context):
     assistant.validate_session(update.effective_chat.id)
 
     response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), update.message.text)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=response_text)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=response_text, parse_mode=telegram.ParseMode.HTML)
 
 def receive_voice(update, context):
     assistant.validate_session(update.effective_chat.id)

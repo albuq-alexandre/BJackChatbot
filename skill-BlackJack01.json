@@ -34,6 +34,9 @@
           "text": "cancelar"
         },
         {
+          "text": "restart"
+        },
+        {
           "text": "Tchau"
         }
       ],
@@ -71,6 +74,24 @@
         }
       ],
       "description": ""
+    },
+    {
+      "intent": "listar",
+      "examples": [
+        {
+          "text": "listar"
+        },
+        {
+          "text": "listar partidas"
+        },
+        {
+          "text": "matches"
+        },
+        {
+          "text": "o que eu joguei"
+        }
+      ],
+      "description": "listar partidas"
     },
     {
       "intent": "parar",
@@ -233,7 +254,7 @@
           {
             "values": [
               {
-                "text": "Jogo Parado. Peça para jogar novamente."
+                "text": "$resposta"
               }
             ],
             "response_type": "text",
@@ -293,9 +314,35 @@
     },
     {
       "type": "standard",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Estatísticas da partida: "
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "estatística",
+          "type": "client",
+          "parameters": {
+            "acao": "estatística"
+          },
+          "result_variable": "resposta"
+        }
+      ],
+      "context": {
+        "resposta": null
+      },
       "metadata": {
         "_customization": {
-          "mcr": true
+          "mcr": false
         }
       },
       "next_step": {
@@ -312,7 +359,7 @@
           {
             "values": [
               {
-                "text": "$resposta"
+                "text": "$resposta Mais uma carta ou parar?"
               }
             ],
             "response_type": "text",
@@ -323,6 +370,66 @@
       "parent": "node_1_1633891198603",
       "conditions": "true",
       "dialog_node": "node_1_1634420944813"
+    },
+    {
+      "type": "standard",
+      "title": "listar Partidas",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Listando Partidas"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "listar",
+          "type": "client",
+          "parameters": {
+            "acao": "listar"
+          },
+          "result_variable": "resposta"
+        }
+      ],
+      "context": {
+        "resposta": null
+      },
+      "metadata": {
+        "_customization": {
+          "mcr": false
+        }
+      },
+      "next_step": {
+        "behavior": "skip_user_input"
+      },
+      "conditions": "#listar",
+      "dialog_node": "node_1_1634447948745",
+      "previous_sibling": "node_1_1633897772852"
+    },
+    {
+      "type": "standard",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "$resposta"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_1_1634447948745",
+      "conditions": "true",
+      "dialog_node": "node_2_1634447948746"
     },
     {
       "type": "standard",
@@ -345,15 +452,28 @@
           }
         ]
       },
+      "actions": [
+        {
+          "name": "terminar",
+          "type": "client",
+          "parameters": {
+            "acao": "terminar"
+          },
+          "result_variable": "resposta"
+        }
+      ],
       "context": {
         "cancelar": true,
         "resposta": null,
         "jogo_iniciado": null
       },
+      "next_step": {
+        "behavior": "skip_user_input"
+      },
       "conditions": "#finalizacao",
       "digress_in": "does_not_return",
       "dialog_node": "node_3_1633890969249",
-      "previous_sibling": "node_1_1633897772852"
+      "previous_sibling": "node_1_1634447948745"
     },
     {
       "type": "standard",
@@ -379,7 +499,7 @@
           {
             "values": [
               {
-                "text": "$resposta \\npc"
+                "text": "$resposta"
               }
             ],
             "response_type": "text",
@@ -405,7 +525,7 @@
           {
             "values": [
               {
-                "text": "R stats $resposta"
+                "text": "$resposta"
               }
             ],
             "response_type": "text",
@@ -432,6 +552,25 @@
       "dialog_node": "node_7_1634092247414",
       "previous_sibling": "node_3_1634168515135",
       "disambiguation_opt_out": true
+    },
+    {
+      "type": "standard",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "$resposta"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_3_1633890969249",
+      "conditions": "true",
+      "dialog_node": "node_9_1634455759534"
     },
     {
       "type": "response_condition",
@@ -533,6 +672,37 @@
     {
       "type": "response_condition",
       "output": {
+        "actions": [
+          {
+            "name": "estatística",
+            "type": "client",
+            "parameters": {
+              "acao": "estatística"
+            },
+            "result_variable": "resposta"
+          }
+        ],
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Estatísticas da partida: $resposta"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_1_1634447948745",
+      "disabled": true,
+      "conditions": "$jogo_iniciado",
+      "dialog_node": "response_3_1634447948746",
+      "previous_sibling": "node_2_1634447948746"
+    },
+    {
+      "type": "response_condition",
+      "output": {
         "generic": [
           {
             "values": [
@@ -562,6 +732,22 @@
       "conditions": "$jogo_iniciado",
       "dialog_node": "response_4_1634174604134",
       "previous_sibling": "node_10_1634421142756"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "text": {
+          "values": [
+            "stats Parece que a partida ainda não iniciou. Vamos Jogar Blackjack?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_1_1634447948745",
+      "disabled": true,
+      "conditions": "anything_else",
+      "dialog_node": "response_4_1634447948746",
+      "previous_sibling": "response_3_1634447948746"
     },
     {
       "type": "response_condition",
@@ -638,7 +824,7 @@
           {
             "values": [
               {
-                "text": "Estatísticas da partida:"
+                "text": "Estatísticas da partida: "
               }
             ],
             "response_type": "text",
@@ -647,6 +833,7 @@
         ]
       },
       "parent": "node_1_1633897772852",
+      "disabled": true,
       "conditions": "$jogo_iniciado",
       "dialog_node": "response_9_1633897788691",
       "previous_sibling": "node_6_1634422155526"
@@ -662,6 +849,7 @@
         }
       },
       "parent": "node_1_1633897772852",
+      "disabled": true,
       "conditions": "anything_else",
       "dialog_node": "response_9_1633897790809",
       "previous_sibling": "response_9_1633897788691"
