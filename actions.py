@@ -28,10 +28,13 @@ def action_handler(action, parameters, return_var, game):
         return_values = game.players[1].stats()
 
 
+    return_values_img = None
+
     return {
             'skills': {
                 'main skill': {
-                    'user_defined': { return_var: return_values}
+                    'user_defined': { return_var: return_values},
+                    'user_image': { 'img_resposta': return_values_img}
                 }
             }
         }

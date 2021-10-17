@@ -75,7 +75,19 @@ class Player:
         values = {"2": 2,  "3": 3 , "4":4, "5":5,
                   "6":6, "7": 7,"8": 8, "9" : 9, "10": 10,
                   "JACK": 10, "QUEEN": 10, "KING": 10, "ACE": 11}
+        labels = {"2": 2,  "3": 3 , "4":4, "5":5,
+                  "6":6, "7": 7,"8": 8, "9" : 9, "10": 10,
+                  "JACK": 10, "QUEEN": 10, "KING": 10, "ACE": 11}
+
         return values[card_value]
+
+    def get_card_labels(self, card_code = None): #TODO: Juliano
+        card_label = '[2♠]'
+        return card_label
+
+    def get_audible_card(self, card_code = None): #TODO: Juliano
+        audible_card = "Dez de Copas"
+        return audible_card
 
     def get_game_score(self):
         if self.ace_counter == 0:
