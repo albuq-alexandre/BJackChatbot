@@ -13,7 +13,7 @@ import logging
 
 #Variaveis de ambiente de configuracao
 TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
-PORT = int(os.environ.get('$PORT', '8443'))
+PORT = int(os.environ.get('PORT', '8443'))
 WEBHOOK_URL = os.environ.get('TELEGRAM_WEBHOOK')
 
 # if not WEBHOOK_URL:
