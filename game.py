@@ -65,11 +65,12 @@ class Player:
                 card_codes[-1] = '?'
             ret = ", ".join(card for card in card_codes)
         if audible:
-            card_codes = [('10' if card[0]['code'][0] == '0' else card[0]['code'][0]) +
+            card_codes = [('10' if card[0]['code'][0] == '0' else self.get_card_name(card[0]['code'][0])) +
                           self.get_audible_suit(card[0]['code'][1]) for card in self.hand]
             if mock and self.name == "Banca":
-                card_codes[-1] = '?'
+                card_codes[-1] = 'carta fechada'
             ret = ", ".join(card for card in card_codes)
+            ret += '.'
         return ret
 
     def set_game_score(self, card_code):
@@ -97,6 +98,18 @@ class Player:
             return '♣'
         if card_suit == 'D':
             return '♦'
+
+    def get_card_name(self, card = None):
+        if card == 'A':
+            return 'As'
+        if card == 'J':
+            return 'Valete'
+        elif card == 'Q':
+            return 'Dama'
+        elif card == 'K':
+            return 'Rei'
+        else:
+            return card
 
     def get_audible_suit(self, card_suit = None):
         if card_suit == 'S':
@@ -190,13 +203,15 @@ class BlackJackGame:
         self.deck = Deck()
         self.evaluated = False
 
-    def start(self):
+    def start(self, audible):
 
         if self.running:
             raise Exception('O Jogo já foi iniciado anteriormente')
         if self.deck.remaining < 4:
             self.deck = Deck()
         self.running = True
+        #enable audible conversation
+        self.audible = audible
         #empty piles
         for player in (self.players):
             player.new_hand()
@@ -206,7 +221,7 @@ class BlackJackGame:
             player.draw_from_deck(self.deck)
         self._current_player = 1
 
-        resp = "Cartas na mesa: \n" + "\n".join("<b>"+player.name +": </b> "+ player.show_hand(text=True, mock=True) for player in self.players) + "\n"
+        resp = "Cartas na mesa: \n" + "\n".join("<b>"+player.name +": </b> "+ player.show_hand(text=True, mock=True, audible=audible) for player in self.players) + "\n"
         self.evaluated = False
         if self.get_current_player().has_blackjack():
             self.dealers_turn()
@@ -215,17 +230,17 @@ class BlackJackGame:
     def get_current_player(self):
         return self.players[self._current_player]
 
-    def draw_card(self):
+    def draw_card(self, audible):
         # Players turn
         player = self.players[self._current_player]
         if player.name == "Banca":
-            self.dealers_turn()
+            self.dealers_turn(audible)
         else:
             player.draw_from_deck(self.deck)
             if player.busted() or player.has_21():
                 player.turn_over = True
                 self._current_player = 0
-                resp = self.dealers_turn()
+                resp = self.dealers_turn(audible)
             else:
                 resp = "Seu Turno: \n"
                 for player in self.players:
@@ -235,14 +250,14 @@ class BlackJackGame:
                     if player.busted():
                         score = "<b>Estourou!</b>" + score
                     if player.name == "Banca":
-                        score = " ??"
-                    resp = resp + player.name + score + " Pontos - " + player.show_hand(text=True, mock=True) + '\n'
+                        score = " xx"
+                    resp = resp + player.name + " está com " + score + " Pontos. " + player.show_hand(text=True, mock=True, audible=audible) + '\n'
                 resp = resp + "Mais uma carta ou parar?"
         return resp
 
-    def dealers_turn(self):
+    def dealers_turn(self, audible):
         if not self.running:
-            raise Exception("O Jogo deve iniciar antes da vez do Banca")
+            raise Exception("O Jogo deve iniciar antes da vez da Banca")
 
         while self.dealer.get_game_score() <= 16:
             self.dealer.draw_from_deck(self.deck)
@@ -250,15 +265,15 @@ class BlackJackGame:
         self.dealer.turn_over = True
         # self.dealer.show_hand(text=True)
 
-        resp = "Turno do Banca: \n"
+        resp = "Turno da Banca: \n"
         for player in self.players:
             score = " " + str(player.get_game_score())
             if player.has_blackjack():
                 score = " <b>BlackJack!</b>" + score
             if player.busted():
                 score = " <b>Estourou!</b>" + score
-            resp = resp + player.name + score + " Pontos - " + player.show_hand(text=True) + '\n'
-        self.evaluate()
+            resp = resp + player.name + score + " Pontos. " + player.show_hand(text=True, audible=audible) + '\n'
+        self.evaluate(audible)
         self.running = False
         return resp + "\n\n" + self.players[1].stats()
 
@@ -275,7 +290,7 @@ class BlackJackGame:
 
 
 
-    def evaluate(self):
+    def evaluate(self, audible): # TODO: adaptar textos para áudio neste método
         """
         Check which player won and which lost.
         :return:
