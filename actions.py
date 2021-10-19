@@ -1,16 +1,16 @@
 
-def action_handler(action, parameters, return_var, game):
+def action_handler(action, parameters, return_var, game, audible):
     return_values = {}
     if action == 'iniciar':
-        return_values = game.start()
+        return_values = game.start(audible)
 
     elif action == 'mais1carta':
-        return_values = game.draw_card()
+        return_values = game.draw_card(audible)
 
     elif action == 'parar':
         if game.running:
-            game.dealers_turn()
-        return_values = game.evaluate()
+            game.dealers_turn(audible)
+        return_values = game.evaluate(audible)
 
     elif action == 'terminar':
         ret = ''
