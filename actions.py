@@ -1,16 +1,25 @@
 
 def action_handler(action, parameters, return_var, game):
     return_values = {}
+    return_values_img = None
+
     if action == 'iniciar':
-        return_values = game.start()
+        txt_values, return_values_img = game.start()
+        return_values["texto"] = txt_values
+        return_values["img"] = return_values_img
+
 
     elif action == 'mais1carta':
-        return_values = game.draw_card()
+        txt_values, return_values_img = game.draw_card()
+        return_values["texto"] = txt_values
+        return_values["img"] = return_values_img
 
     elif action == 'parar':
         if game.running:
             game.dealers_turn()
-        return_values = game.evaluate()
+        txt_values, return_values_img = game.evaluate()
+        return_values["texto"] = txt_values
+        return_values["img"] = return_values_img
 
     elif action == 'terminar':
         ret = ''
@@ -28,13 +37,13 @@ def action_handler(action, parameters, return_var, game):
         return_values = game.players[1].stats()
 
 
-    return_values_img = None
+
 
     return {
             'skills': {
                 'main skill': {
-                    'user_defined': { return_var: return_values},
-                    'user_image': { 'img_resposta': return_values_img}
+                    'user_defined': { return_var: return_values }
+
                 }
             }
         }
