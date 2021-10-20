@@ -74,7 +74,8 @@ def start(update, context):
     assistant.validate_session(update.effective_chat.id)
     games[update.effective_chat.id] = BlackJackGame()
     response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), '', games[update.effective_chat.id])
-    context.bot.send_message(chat_id=update.effective_chat.id, text=response_text['text'])
+    if 'text' in response_text:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=response_text['text'])
     if 'img' in response_text:
         context.bot.send_photo(chat_id=update.effective_chat.id, photo=response_text['img'])
 
@@ -88,17 +89,16 @@ def message(update, context):
 
     response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), update.message.text, games[update.effective_chat.id])
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text=response_text['text'], parse_mode=telegram.ParseMode.HTML)
+    if 'text' in response_text:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=response_text['text'], parse_mode=telegram.ParseMode.HTML)
     if 'img' in response_text:
         context.bot.send_photo(chat_id=update.effective_chat.id, photo=base64.b64decode(response_text['img']))
 
 def receive_voice(update, context):
     assistant.validate_session(update.effective_chat.id)
-
     audio_file = BytesIO(update.message.voice.get_file().download_as_bytearray())
     text = voice.convert_voice(audio_file)
     response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), text, games[update.effective_chat.id], audible=True)
-
     context.bot.send_voice(chat_id=update.effective_chat.id, voice=voice.convert_text(response_text['text']))
 
 
