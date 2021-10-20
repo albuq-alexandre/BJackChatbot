@@ -4,6 +4,12 @@
       "intent": "estatisticas",
       "examples": [
         {
+          "text": "estatistica"
+        },
+        {
+          "text": "estatística"
+        },
+        {
           "text": "Qual é o meu score"
         },
         {
@@ -11,6 +17,9 @@
         },
         {
           "text": "Quero ver as estatísticas"
+        },
+        {
+          "text": "score"
         },
         {
           "text": "stats"
@@ -22,6 +31,9 @@
       "intent": "finalizacao",
       "examples": [
         {
+          "text": "👋"
+        },
+        {
           "text": "Até a próxima"
         },
         {
@@ -32,6 +44,9 @@
         },
         {
           "text": "cancelar"
+        },
+        {
+          "text": "encerrar"
         },
         {
           "text": "restart"
@@ -58,6 +73,12 @@
           "text": "Incie um novo jogo"
         },
         {
+          "text": "iniciar"
+        },
+        {
+          "text": "iniciar jogo"
+        },
+        {
           "text": "Jogar"
         },
         {
@@ -79,6 +100,9 @@
       "intent": "listar",
       "examples": [
         {
+          "text": "list"
+        },
+        {
           "text": "listar"
         },
         {
@@ -94,6 +118,27 @@
       "description": "listar partidas"
     },
     {
+      "intent": "Menu",
+      "examples": [
+        {
+          "text": "Menu"
+        },
+        {
+          "text": "minhas alternativas"
+        },
+        {
+          "text": "Opções"
+        },
+        {
+          "text": "O que você faz"
+        },
+        {
+          "text": "O que você pode fazer"
+        }
+      ],
+      "description": ""
+    },
+    {
       "intent": "parar",
       "examples": [
         {
@@ -101,6 +146,9 @@
         },
         {
           "text": "não"
+        },
+        {
+          "text": "para"
         },
         {
           "text": "parar"
@@ -254,11 +302,16 @@
           {
             "values": [
               {
-                "text": "$resposta"
+                "text": "$resposta.text"
               }
             ],
             "response_type": "text",
             "selection_policy": "sequential"
+          },
+          {
+            "source": "$resposta.img",
+            "alt_text": "$resposta.texto",
+            "response_type": "image"
           }
         ]
       },
@@ -309,7 +362,7 @@
       },
       "conditions": "#iniciar",
       "dialog_node": "node_1_1633891198603",
-      "previous_sibling": "Bem-vindo",
+      "previous_sibling": "node_5_1634507233780",
       "disambiguation_opt_out": true
     },
     {
@@ -359,11 +412,18 @@
           {
             "values": [
               {
-                "text": "$resposta Mais uma carta ou parar?"
+                "text": "$resposta.text"
               }
             ],
             "response_type": "text",
             "selection_policy": "sequential"
+          },
+          {
+            "title": "Hand",
+            "source": "$resposta.img",
+            "alt_text": "$resposta.text",
+            "description": "Hand",
+            "response_type": "image"
           }
         ]
       },
@@ -419,7 +479,7 @@
           {
             "values": [
               {
-                "text": "$resposta"
+                "text": "$resposta.text"
               }
             ],
             "response_type": "text",
@@ -493,17 +553,42 @@
     },
     {
       "type": "standard",
+      "title": "Menu",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Eu sou um Chatbot feito pelo Grupo do Alexandre, Celso e Juliano. \nOlha só o que eu posso fazer:\n\n<i><b>    - Iniciar:</b> Inicia o  Jogo <b><u>BlackJack!</u></b>;\n<b>        - Mais uma: </b> durante o jogo, para receber uma carta;\n<b>        - Parar: </b> para finalizar seu turno.\n<b>    - Listar: </b>Lista suas partidas de BlackJack no jogo atual;\n<b>    - Estatistica: </b>Mostra seu percentual de vitórias;\n<b>    - Encerrar: </b>Quando estiver perdido, diga <b><u>Tchau</u></b> que a gente começa de novo!</i>\n\nEu entendo linguagem natural e áudio, então você pode me dizer o que você quer fazer de várias formas. \n\n<b>Vamos jogar BlackJack?</b>\n"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "multiline"
+          }
+        ]
+      },
+      "conditions": "#Menu",
+      "dialog_node": "node_5_1634507233780",
+      "previous_sibling": "Bem-vindo"
+    },
+    {
+      "type": "standard",
       "title": "nó pegar carta",
       "output": {
         "generic": [
           {
             "values": [
               {
-                "text": "$resposta"
+                "text": "$resposta.text"
               }
             ],
             "response_type": "text",
             "selection_policy": "sequential"
+          },
+          {
+            "source": "$resposta.img",
+            "alt_text": "$resposta.text",
+            "response_type": "image"
           }
         ]
       },
@@ -525,7 +610,7 @@
           {
             "values": [
               {
-                "text": "$resposta"
+                "text": "$resposta.text"
               }
             ],
             "response_type": "text",
@@ -560,7 +645,7 @@
           {
             "values": [
               {
-                "text": "$resposta"
+                "text": "$resposta.text"
               }
             ],
             "response_type": "text",
@@ -727,7 +812,8 @@
         }
       ],
       "context": {
-        "resposta": null
+        "resposta": null,
+        "jogo_iniciado": null
       },
       "conditions": "$jogo_iniciado",
       "dialog_node": "response_4_1634174604134",
@@ -789,7 +875,7 @@
           {
             "values": [
               {
-                "text": "Parece que o jogo não iniciou..."
+                "text": "Parece que o jogo não iniciou, ou você demorou um pouco pra responder e eu desisti da mão. Vamos jogar Blackjack?"
               }
             ],
             "response_type": "text",

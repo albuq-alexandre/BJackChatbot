@@ -43,5 +43,5 @@ def convert_text(message):
         voice='pt-BR_IsabelaV3Voice',
         accept='audio/ogg'
     )
-    logger.info('Convertando texto em voz')
+    logger.info('Convertendo texto em voz')
     return BytesIO(response.get_result().content)
