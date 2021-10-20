@@ -42,7 +42,7 @@ def validate_session(chat_id):
     SessionManager.getInstance().updateSession(chat_id, session_id)
 
 
-def execute_action(session_id, response, audible, game:BlackJackGame):
+def execute_action(session_id, response, game:BlackJackGame, audible):
 
     #verifica se a resposta tem acao para ser executada
 

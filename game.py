@@ -38,7 +38,7 @@ class Player:
         self.turn_over = False
 
     def show_hand(self, text = False, mock = False, audible = False):
-        if text:
+        if text and not audible:
             card_codes = [('10' if card[0]['code'][0] == '0' else card[0]['code'][0]) +
                           self.get_card_suit(card[0]['code'][1]) for card in self.hand]
             if mock and self.name == "Banca":
@@ -99,11 +99,11 @@ class Player:
 
     def get_card_name(self, card = None):
         if card == 'A':
-            return 'AAce'
+            return 'Ás'
         if card == 'J':
             return 'Valete'
         elif card == 'Q':
-            return 'Dama'
+            return 'Dâma'
         elif card == 'K':
             return 'Rei'
         else:
@@ -224,13 +224,13 @@ class BlackJackGame:
             if player.busted():
                 score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score 
             if player.name == "Banca":
-                score = " ??" if not audible else "Cartas Fechadas"
-            resp = resp + player.name + score + " Pontos. " + player.show_hand(text=True, mock=True, audible=audible) + '\n'
+                score = " ??" if not audible else " está com "
+            resp = resp + player.name + score + (" Pontos. Suas cartas são " if player.name != 'Banca' else "") + player.show_hand(text=True, mock=True, audible=audible) + '\n'
         resp = resp + "Mais uma carta ou parar?"
         self.evaluated = False
         
         if self.get_current_player().has_blackjack():
-            self.dealers_turn()
+            self.dealers_turn(audible)
             
         return resp, self.table(mock=True)
 
@@ -257,8 +257,8 @@ class BlackJackGame:
                     if player.busted():
                         score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score 
                     if player.name == "Banca":
-                        score = " ??" if not audible else "Cartas Fechadas"
-                    resp = resp + player.name + score + " Pontos. " + player.show_hand(text=True, mock=True, audible=audible) + '\n'
+                        score = " ??" if not audible else ""
+                    resp = resp + player.name + score + (" Pontos. " if player.name != 'Banca' else "") + player.show_hand(text=True, mock=True, audible=audible) + '\n'
         resp = resp + "Mais uma carta ou parar?"
         return resp, self.table(mock = True)
 
