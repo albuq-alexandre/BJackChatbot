@@ -52,7 +52,7 @@ class Player:
                 card_codes[-1] = 'carta fechada'
             ret = ", ".join(card for card in card_codes)
             ret += '.'
-         else:
+        else:
             count = len(self.hand)
             imgs_loader = [Image.open(requests.get(card[0]['image'], stream=True).raw).convert("RGB") for card in self.hand]
             card_labels = [self.get_value(card_value=card[0]['value']) for card in self.hand]
