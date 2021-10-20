@@ -97,7 +97,8 @@ def receive_voice(update, context):
 
     audio_file = BytesIO(update.message.voice.get_file().download_as_bytearray())
     text = voice.convert_voice(audio_file)
-    response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), text, games[update.effective_chat.id])
-    context.bot.send_voice(chat_id=update.effective_chat.id, voice=voice.convert_text(response_text))
+    response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), text, games[update.effective_chat.id], audible=True)
+
+    context.bot.send_voice(chat_id=update.effective_chat.id, voice=voice.convert_text(response_text['text']))
 
 

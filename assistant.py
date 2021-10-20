@@ -41,14 +41,17 @@ def validate_session(chat_id):
 
     SessionManager.getInstance().updateSession(chat_id, session_id)
 
-def execute_action(session_id, response, game:BlackJackGame):
+
+def execute_action(session_id, response, audible, game:BlackJackGame):
+
     #verifica se a resposta tem acao para ser executada
 
     if 'actions' in response['output']:
         action = response['output']['actions'][0]
         logger.info('Executando ação ' + action['name'])
+        logger.info('Audible? ' + str(audible))
         #executa a ação correta e recebe dados em um dicionario
-        result_data = actions.action_handler(action['name'], action['parameters'], action['result_variable'], game)
+        result_data = actions.action_handler(action['name'], action['parameters'], action['result_variable'], game, audible)
         #envia dados de resposta como contexto para o Watson Assistant
         logger.info(result_data)
         response = assistant.message(
@@ -59,8 +62,10 @@ def execute_action(session_id, response, game:BlackJackGame):
     return response
 
 
-def send_message(session_id, message, game:BlackJackGame):
+
+def send_message(session_id, message, game:BlackJackGame, audible=False):
     ret = {}
+
     logger.info('Enviando mensagem para o Assistant: ' + message)
     response = assistant.message(
         assistant_id=assistant_id,
@@ -72,7 +77,9 @@ def send_message(session_id, message, game:BlackJackGame):
     )
     result = response.get_result()
     logger.info(result)
-    result = execute_action(session_id, result, game)
+
+    result = execute_action(session_id, result, game, audible)
+
     logger.info("apos execute action" )
     logger.info(result)
     if not result['output']['generic'][0]['text']:
