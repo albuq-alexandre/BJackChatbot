@@ -3,6 +3,7 @@ import io
 import matplotlib.pyplot as plt
 from PIL import Image
 import base64
+from collections import OrderedDict
 
 
 class Deck:
@@ -37,40 +38,41 @@ class Player:
         self.turn_over = False
 
     def show_hand(self, text = False, mock = False, audible = False):
-        count = len(self.hand)
-        imgs_loader = [Image.open(requests.get(card[0]['image'], stream=True).raw).convert("RGB") for card in self.hand]
-        card_labels = [self.get_value(card_value=card[0]['value']) for card in self.hand]
-        score = str(self.get_game_score())
-        if mock and self.name == "Banca":
-            imgs_loader[-1] = Image.open('b0C.png').convert("RGB")
-            card_labels[-1] = '?'
-            score = '?'
-
-        fig = plt.figure(figsize=(count, 2))
-        for idx in range(len(card_labels)):
-            ax = fig.add_subplot(1, count, idx+1, xticks=[], yticks=[])
-            ax.set_title(card_labels[idx])
-            fig.suptitle(f'{self.name}: {score}', horizontalalignment='right')
-            plt.imshow(imgs_loader[idx])
-        buf = io.BytesIO()
-        # alternative buf = StringIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        ret = base64.b64encode(buf.read()).decode('utf-8')
-        # alternative: ret = send_file(img, mimetype='image/png')
         if text:
             card_codes = [('10' if card[0]['code'][0] == '0' else card[0]['code'][0]) +
                           self.get_card_suit(card[0]['code'][1]) for card in self.hand]
             if mock and self.name == "Banca":
                 card_codes[-1] = '?'
             ret = ", ".join(card for card in card_codes)
-        if audible:
+
+        elif audible:
             card_codes = [('10' if card[0]['code'][0] == '0' else self.get_card_name(card[0]['code'][0])) +
                           self.get_audible_suit(card[0]['code'][1]) for card in self.hand]
             if mock and self.name == "Banca":
                 card_codes[-1] = 'carta fechada'
             ret = ", ".join(card for card in card_codes)
             ret += '.'
+         else:
+            count = len(self.hand)
+            imgs_loader = [Image.open(requests.get(card[0]['image'], stream=True).raw).convert("RGB") for card in self.hand]
+            card_labels = [self.get_value(card_value=card[0]['value']) for card in self.hand]
+            score = str(self.get_game_score())
+            if mock and self.name == "Banca":
+                imgs_loader[-1] = Image.open('b0C.png').convert("RGB")
+                card_labels[-1] = '?'
+                score = '?'
+            fig = plt.figure(figsize=(count, 1.5))
+            for idx in range(len(card_labels)):
+                ax = fig.add_subplot(1, count, idx+1, xticks=[], yticks=[])
+                # ax.set_title(card_labels[idx])
+                plt.imshow(imgs_loader[idx])
+            fig.suptitle(f'{self.name}: {score}', horizontalalignment='right')
+            plt.tight_layout()
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png')
+            plt.close()
+            buf.seek(0)
+            ret = buf
         return ret
 
     def set_game_score(self, card_code):
@@ -83,10 +85,6 @@ class Player:
         values = {"2": 2,  "3": 3 , "4":4, "5":5,
                   "6":6, "7": 7,"8": 8, "9" : 9, "10": 10,
                   "JACK": 10, "QUEEN": 10, "KING": 10, "ACE": 11}
-        labels = {"2": 2,  "3": 3 , "4":4, "5":5,
-                  "6":6, "7": 7,"8": 8, "9" : 9, "10": 10,
-                  "JACK": 10, "QUEEN": 10, "KING": 10, "ACE": 11}
-
         return values[card_value]
 
     def get_card_suit(self, card_suit = None):
@@ -101,7 +99,7 @@ class Player:
 
     def get_card_name(self, card = None):
         if card == 'A':
-            return 'As'
+            return 'AAce'
         if card == 'J':
             return 'Valete'
         elif card == 'Q':
@@ -175,8 +173,8 @@ class Player:
         if len(self.matches) > 0:
             win_percent = self.win/len(self.matches)
             bar = generate_bar_chart(win_percent*100)
-            template = 'Aqui estão suas estatísticas 📊:\n\n<b>Jogos:</b> {}\n<b>Vitórias:</b> {}\n\n{}\n\n<b>Porcentagem de vitórias:</b> {:.2%}\n'
-            template = template.format(len(self.matches), self.win, bar, win_percent)
+            template = 'Estatísticas do jogador <b>{}</b> 📊:\n\n<b>Jogos:</b> {}\n<b>Vitórias:</b> {}\n\n{}\n\n<b>Porcentagem de vitórias:</b> {:.2%}\n'
+            template = template.format(self.name, len(self.matches), self.win, bar, win_percent)
             return template
         else:
             return "Sem estatísticas. \nNenhuma partida concluída."
@@ -205,8 +203,6 @@ class BlackJackGame:
 
     def start(self, audible):
 
-        if self.running:
-            raise Exception('O Jogo já foi iniciado anteriormente')
         if self.deck.remaining < 4:
             self.deck = Deck()
         self.running = True
@@ -220,12 +216,23 @@ class BlackJackGame:
         for player in (self.players) * 2:
             player.draw_from_deck(self.deck)
         self._current_player = 1
-
-        resp = "Cartas na mesa: \n" + "\n".join("<b>"+player.name +": </b> "+ player.show_hand(text=True, mock=True, audible=audible) for player in self.players) + "\n"
+        resp = "Cartas na mesa: \n"
+        for player in self.players:
+            score = " " + str(player.get_game_score()) if not audible else " Está com " + str(player.get_game_score())
+            if player.has_blackjack() :
+                score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
+            if player.busted():
+                score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score 
+            if player.name == "Banca":
+                score = " ??" if not audible else "Cartas Fechadas"
+            resp = resp + player.name + score + " Pontos. " + player.show_hand(text=True, mock=True, audible=audible) + '\n'
+        resp = resp + "Mais uma carta ou parar?"
         self.evaluated = False
+        
         if self.get_current_player().has_blackjack():
             self.dealers_turn()
-        return resp
+            
+        return resp, self.table(mock=True)
 
     def get_current_player(self):
         return self.players[self._current_player]
@@ -244,38 +251,38 @@ class BlackJackGame:
             else:
                 resp = "Seu Turno: \n"
                 for player in self.players:
-                    score = " " + str(player.get_game_score())
+                    score = " " + str(player.get_game_score()) if not audible else " Está com " + str(player.get_game_score())
                     if player.has_blackjack() :
-                        score = "<b>BlackJack!</b>" + score
+                        score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
                     if player.busted():
-                        score = "<b>Estourou!</b>" + score
+                        score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score 
                     if player.name == "Banca":
-                        score = " xx"
-                    resp = resp + player.name + " está com " + score + " Pontos. " + player.show_hand(text=True, mock=True, audible=audible) + '\n'
-                resp = resp + "Mais uma carta ou parar?"
-        return resp
+                        score = " ??" if not audible else "Cartas Fechadas"
+                    resp = resp + player.name + score + " Pontos. " + player.show_hand(text=True, mock=True, audible=audible) + '\n'
+        resp = resp + "Mais uma carta ou parar?"
+        return resp, self.table(mock = True)
 
     def dealers_turn(self, audible):
         if not self.running:
-            raise Exception("O Jogo deve iniciar antes da vez da Banca")
+            return "O Jogo deve iniciar antes da vez da Banca"
+
 
         while self.dealer.get_game_score() <= 16:
             self.dealer.draw_from_deck(self.deck)
 
         self.dealer.turn_over = True
-        # self.dealer.show_hand(text=True)
-
         resp = "Turno da Banca: \n"
         for player in self.players:
-            score = " " + str(player.get_game_score())
-            if player.has_blackjack():
-                score = " <b>BlackJack!</b>" + score
+            score = " " + str(player.get_game_score()) if not audible else " Está com " + str(player.get_game_score())
+            if player.has_blackjack() :
+                score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
             if player.busted():
-                score = " <b>Estourou!</b>" + score
+                score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score
             resp = resp + player.name + score + " Pontos. " + player.show_hand(text=True, audible=audible) + '\n'
         self.evaluate(audible)
         self.running = False
-        return resp + "\n\n" + self.players[1].stats()
+        
+        return resp + "\n\n" + self.players[1].stats() + "\n\nJogo Parado. Peça para jogar novamente."
 
     def stop(self):
         """
@@ -283,9 +290,9 @@ class BlackJackGame:
         :return:
         """
         if not self.running:
-            raise Exception("O Jogo não foi iniciado")
+            return "O Jogo não foi iniciado"
         self.get_current_player().turn_over = True
-        # self.evaluate()
+        
         self.running = False
 
 
@@ -343,7 +350,7 @@ class BlackJackGame:
 
         ret = ret + '\n\n' + self.players[1].stats() +  "\n\nJogo Parado. Peça para jogar novamente."
         self.evaluated = True
-        return ret
+        return ret, self.table()
 
     def terminate (self):
         #return to same state as a new instance of BlackJackGame
@@ -358,6 +365,23 @@ class BlackJackGame:
         self.players.append(Player("Você"))
         self.deck = Deck()
 
+    def table(self, mock = False):
+        imgs_loader = [player.show_hand(mock=mock) for player in self.players]
+        fig = plt.figure(figsize=(len(imgs_loader)+1, 5))
+        for idx in range(len(imgs_loader)):
+            ax = fig.add_subplot(len(imgs_loader), 1, idx+1, xticks=[], yticks=[])
+            ax.axis('off')
+            plt.imshow(Image.open(imgs_loader[idx]))
+        fig.suptitle('Cartas na Mesa:')
+        plt.tight_layout()
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        plt.close()
+        buf.seek(0)
+        ret = base64.b64encode(buf.read()).decode('utf-8')
+
+        return ret
+
 def generate_bar_chart(win_percentage):
     """
     Generate a string of emojis representing a bar (10 chars) that indicates wins vs. losses
@@ -368,6 +392,16 @@ def generate_bar_chart(win_percentage):
     loss_portion = 10 - win_portion
     return "🏆" * win_portion + "🔴" * loss_portion
 
+class FixSizeOrderedDict(OrderedDict):
+    def __init__(self, *args, maxlen=0, **kwargs):
+        self._maxlen = maxlen
+        super().__init__(*args, **kwargs)
+
+    def __setitem__(self, key, value):
+        OrderedDict.__setitem__(self, key, value)
+        if self._maxlen > 0:
+            if len(self) > self._maxlen:
+                self.popitem(False)
 
 
 

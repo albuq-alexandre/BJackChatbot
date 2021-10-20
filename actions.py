@@ -1,16 +1,26 @@
 
 def action_handler(action, parameters, return_var, game, audible):
     return_values = {}
+    return_values_img = None
+
     if action == 'iniciar':
-        return_values = game.start(audible)
+        txt_values, return_values_img = game.start(audible)
+        return_values["texto"] = txt_values
+        return_values["img"] = return_values_img
+
 
     elif action == 'mais1carta':
-        return_values = game.draw_card(audible)
+        txt_values, return_values_img = game.draw_card(audible)
+        return_values["texto"] = txt_values
+        return_values["img"] = return_values_img
 
     elif action == 'parar':
         if game.running:
             game.dealers_turn(audible)
-        return_values = game.evaluate(audible)
+        txt_values, return_values_img = game.evaluate(audible)
+        return_values["texto"] = txt_values
+        return_values["img"] = return_values_img
+
 
     elif action == 'terminar':
         ret = ''
@@ -28,13 +38,13 @@ def action_handler(action, parameters, return_var, game, audible):
         return_values = game.players[1].stats()
 
 
-    return_values_img = None
+
 
     return {
             'skills': {
                 'main skill': {
-                    'user_defined': { return_var: return_values},
-                    'user_image': { 'img_resposta': return_values_img}
+                    'user_defined': { return_var: return_values }
+
                 }
             }
         }

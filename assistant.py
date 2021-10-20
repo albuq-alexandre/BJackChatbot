@@ -22,7 +22,7 @@ assistant = AssistantV2(
 
 assistant.set_service_url(ASSISTANT_URL)
 
-game = BlackJackGame()
+game = {}
 
 def create_session():
     response = assistant.create_session(assistant_id)
@@ -31,6 +31,7 @@ def create_session():
 def validate_session(chat_id):
     # check if session is valid for current chat_id
     logger.info('Validando sessão de ' + str(chat_id))
+
     if not SessionManager.getInstance().checkSession(chat_id):
         session_id = create_session()
         logger.info('Sessão criada para ' + str(chat_id))
@@ -40,8 +41,11 @@ def validate_session(chat_id):
 
     SessionManager.getInstance().updateSession(chat_id, session_id)
 
-def execute_action(session_id, response, audible):
+
+def execute_action(session_id, response, audible, game:BlackJackGame):
+
     #verifica se a resposta tem acao para ser executada
+
     if 'actions' in response['output']:
         action = response['output']['actions'][0]
         logger.info('Executando ação ' + action['name'])
@@ -58,7 +62,10 @@ def execute_action(session_id, response, audible):
     return response
 
 
-def send_message(session_id, message, audible=False):
+
+def send_message(session_id, message, game:BlackJackGame, audible=False):
+    ret = {}
+
     logger.info('Enviando mensagem para o Assistant: ' + message)
     response = assistant.message(
         assistant_id=assistant_id,
@@ -70,8 +77,18 @@ def send_message(session_id, message, audible=False):
     )
     result = response.get_result()
     logger.info(result)
-    result = execute_action(session_id, result, audible)
+
+    result = execute_action(session_id, result, game, audible)
+
     logger.info("apos execute action" )
     logger.info(result)
-    logger.info('Recebido do assistant: ' + result['output']['generic'][0]['text'])
-    return result['output']['generic'][0]['text']
+    if not result['output']['generic'][0]['text']:
+        logger.info('Nenhuma mensagem recebida do assistant.')
+        ret['text'] = "Me perdi 🤪😵‍💫, digite tchau para começar novamente"
+    else:
+        logger.info('Recebido do assistant: ' + result['output']['generic'][0]['text'])
+        ret['text'] = result['output']['generic'][0]['text']
+        if len(result['output']['generic']) > 1:
+            ret['img'] = result['output']['generic'][1]['source']
+    return ret
+
