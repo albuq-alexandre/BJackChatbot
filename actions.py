@@ -27,7 +27,7 @@ def action_handler(action, parameters, return_var, game, audible):
         for player in game.players:
             ret = ret + "<b>" + player.name + "</b>\n"
             ret = ret + player.list_matches() + '\n'
-            ret = ret + player.stats() + '\n'
+            ret = ret + player.stats(audible) + '\n'
         return_values["text"] = ret
         game.terminate()
 
@@ -35,7 +35,7 @@ def action_handler(action, parameters, return_var, game, audible):
         return_values["text"] = game.players[1].list_matches()
 
     elif action == 'estatística':
-        return_values["text"] = game.players[1].stats()
+        return_values["text"] = game.players[1].stats(audible)
 
 
 
