@@ -321,72 +321,75 @@ class BlackJackGame:
         Check which player won and which lost.
         :return:
         """
-        list_busted = [player for player in self.players if player.busted()]
-        list_not_busted = [player for player in self.players if not player.busted()]
+        list_busted = [player for player in self.players if player.busted() and not player.name =='Banca']
+        list_not_busted = [player for player in self.players if not player.busted()and not player.name =='Banca']
         ret = ''
 
         if self.dealer.busted():
-            if len(list_busted) > 1:
-                for player in list_busted:
-                    if not self.evaluated: player.matches.append({"win": 0, "score": player.get_game_score() })
-                    if audible:
-                        ret = f'Ambos estouraram e ninguém venceu. Você fez {player.get_game_score()} pontos. A Banca fez {self.dealer.get_game_score()} pontos.'
-                    else:
-                        ret = f'Ambos Estouraram!\nNinguém venceu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos'
-            self.dealer.matches.append({"win": 0, "score": self.dealer.get_game_score() })
+            for player in list_busted:
+                if not self.evaluated:
+                    player.matches.append({"win": 0, "score": player.get_game_score() })
+                    self.dealer.matches.append({"win": 0, "score": self.dealer.get_game_score() })
+                if audible:
+                    ret = f'Ambos estouraram e ninguém venceu. Você fez {player.get_game_score()} pontos. A Banca fez {self.dealer.get_game_score()} pontos.'
+                else:
+                    ret = f'Ambos Estouraram!\nNinguém venceu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos'
             for player in list_not_busted:
                 if not self.evaluated:
                     player.win += 1
                     player.matches.append({"win": 1, "score": player.get_game_score() })
+                    self.dealer.matches.append({"win": 0, "score": self.dealer.get_game_score() })
                 if audible:
                     ret = f'O Vencedor foi você com {player.get_game_score()} pontos. A Banca fez {self.dealer.get_game_score()} pontos e Estourou!'
                 else:
                     ret = f'O Vencedor foi você!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos. Estourou!'
 
-
-
         elif self.dealer.has_blackjack():
-            if len(list_not_busted) > 1:
-                for player in list_not_busted:
-                    if player.has_blackjack():
-                        if not self.evaluated:
-                            player.win += 1
-                            player.matches.append({"win": 2, "score": player.get_game_score() })
-                        if audible:
-                            bj = "Bleque jeck! - " if player.has_blackjack() else ""
-                            ret = f'Empataram com {bj}. {player.get_game_score()} pontos!'
-                        else:
-                            bj = "Blackjack Duplo!\n" if player.has_blackjack() else ""
-                            ret = f'Empatou com {bj}{player.get_game_score()} pontos!'
-                    else:
-                        if player.get_game_score()==21:
-                            if not self.evaluated: player.matches.append({"win": 2, "score": player.get_game_score() })
-                            if audible:
-                                ret = f'Você empatou com a banca com {player.get_game_score()} pontos. A Banca fez Bleque Jeck! com 21 pontos.'
-                            else:
-                                ret = f'Empatou com a banca!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} = BlackJack!'
-                        else:
-                            if not self.evaluated: player.matches.append({"win": 0, "score": player.get_game_score() })
-                            if audible:
-                                ret = f'Você perdeu com {player.get_game_score()} pontos. A Banca fez Bleque Jeck! com 21 pontos.'
-                            else:
-                                ret = f'Você perdeu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} \nBlackJack!'
-            else:
-                for player in list_busted:
-                    if not self.evaluated: player.matches.append({"win": 0, "score": player.get_game_score() })
+            for player in list_not_busted:
+                if player.has_blackjack():
+                    if not self.evaluated:
+                        player.win += 1
+                        player.matches.append({"win": 2, "score": player.get_game_score() })
+                        self.dealer.matches.append({"win": 2, "score": self.dealer.get_game_score() })
                     if audible:
-                        ret = f'Você estourou e perdeu com {player.get_game_score()} pontos. A Banca fez {self.dealer.get_game_score()} = BlackJack!'
+                        bj = "Bleque jeck! - " if player.has_blackjack() else ""
+                        ret = f'Empataram com {bj}. {player.get_game_score()} pontos!'
                     else:
-                        ret = f'Você estourou e perdeu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} = BlackJack!'
-                for player in list_not_busted:
-                    if not self.evaluated: player.matches.append({"win": 1, "score": player.get_game_score() })
-                    # ret = f'Você perdeu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} = BlackJack!'
+                        bj = "Blackjack Duplo!\n" if player.has_blackjack() else ""
+                        ret = f'Empatou com {bj}{player.get_game_score()} pontos!'
+                else:
+                    if player.get_game_score()==21:
+                        if not self.evaluated:
+                            player.matches.append({"win": 2, "score": player.get_game_score() })
+                            self.dealer.matches.append({"win": 2, "score": self.dealer.get_game_score() })
+                        if audible:
+                            ret = f'Você empatou com a banca com {player.get_game_score()} pontos. A Banca fez Bleque Jeck! com 21 pontos.'
+                        else:
+                            ret = f'Empatou com a banca!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} = BlackJack!'
+                    else:
+                        if not self.evaluated:
+                            player.matches.append({"win": 0, "score": player.get_game_score() })
+                            self.dealer.matches.append({"win": 1, "score": self.dealer.get_game_score() })
+                        if audible:
+                            ret = f'Você perdeu com {player.get_game_score()} pontos. A Banca fez Bleque Jeck! com 21 pontos.'
+                        else:
+                            ret = f'Você perdeu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} \nBlackJack!'
+            for player in list_busted:
+                if not self.evaluated:
+                    player.matches.append({"win": 0, "score": player.get_game_score() })
+                    self.dealer.matches.append({"win": 1, "score": self.dealer.get_game_score() })
+                if audible:
+                    ret = f'Você estourou e perdeu com {player.get_game_score()} pontos. A Banca fez {self.dealer.get_game_score()} = BlackJack!'
+                else:
+                    ret = f'Você estourou e perdeu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} = BlackJack!'
+
         elif self.dealer.get_game_score() <= 21:
             for player in list_not_busted:
                 if player.get_game_score() > self.dealer.get_game_score():
                     if not self.evaluated:
                         player.win += 1
                         player.matches.append({"win": 1, "score": player.get_game_score() })
+                        self.dealer.matches.append({"win": 0, "score": self.dealer.get_game_score() })
                     if audible:
                         bj = "Bleque jeck! com " if player.has_blackjack() else ""
                         ret = f'O Vencedor foi você! Você fez {bj}{player.get_game_score()} pontos. A Banca fez {self.dealer.get_game_score()} pontos.'
@@ -396,19 +399,24 @@ class BlackJackGame:
                 elif player.get_game_score() == self.dealer.get_game_score():
                     if not self.evaluated:
                         player.matches.append({"win": 2, "score": player.get_game_score() })
+                        self.dealer.matches.append({"win": 2, "score": self.dealer.get_game_score() })
                         player.win += 1
                     if audible:
                         ret = f'Você e a Banca empataram com\n {player.get_game_score()} pontos!'
                     else:
                         ret = f'Empatou com\n {player.get_game_score()} pontos!'
                 elif player.get_game_score() < self.dealer.get_game_score():
-                    if not self.evaluated: player.matches.append({"win": 0, "score": player.get_game_score() })
+                    if not self.evaluated:
+                        player.matches.append({"win": 0, "score": player.get_game_score() })
+                        self.dealer.matches.append({"win": 1, "score": self.dealer.get_game_score() })
                     if audible:
                         ret = f'Você perdeu com {player.get_game_score()} pontos. A Banca venceu com {self.dealer.get_game_score()} pontos.'
                     else:
                         ret = f'Você perdeu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos.'
             for player in list_busted:
-                    if not self.evaluated: player.matches.append({"win": 0, "score": player.get_game_score() })
+                    if not self.evaluated:
+                        player.matches.append({"win": 0, "score": player.get_game_score() })
+                        self.dealer.matches.append({"win": 1, "score": self.dealer.get_game_score() })
                     if audible:
                         ret = f'Você estourou e perdeu com {player.get_game_score()} pontos. A banca venceu com {self.dealer.get_game_score()} pontos.'
                     else:
