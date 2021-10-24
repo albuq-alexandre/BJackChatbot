@@ -61,13 +61,13 @@ class Player:
                 imgs_loader[-1] = Image.open('b0C.png').convert("RGB")
                 card_labels[-1] = '?'
                 score = '?'
-            fig = plt.figure(figsize=(count, 1.5))
+            fig = plt.figure(figsize=(count, count/2))
             for idx in range(len(card_labels)):
                 ax = fig.add_subplot(1, count, idx+1, xticks=[], yticks=[])
-                # ax.set_title(card_labels[idx])
+                ax.axis('off')
                 plt.imshow(imgs_loader[idx])
-            fig.suptitle(f'{self.name}: {score}', horizontalalignment='right')
-            plt.tight_layout()
+            fig.suptitle(f'{self.name}: {score} Pontos')
+            plt.tight_layout(pad=0.1)
             buf = io.BytesIO()
             fig.savefig(buf, format='png')
             plt.close()
@@ -169,7 +169,7 @@ class Player:
     def has_21(self):
         return self.get_game_score() == 21
 
-    def stats(self, audible):
+    def stats(self, audible=False):
         if len(self.matches) > 0:
             win_percent = self.win/len(self.matches)
             bar = generate_bar_chart(win_percent*100)
@@ -187,7 +187,12 @@ class Player:
         ret = ''
         for idx, match in enumerate(self.matches):
             ret = ret + str(idx+1) + 'º - '
-            ret = ret + "Vitória - " if match['win'] == 1 else ret + "Derrota - "
+            if match['win'] == 1:
+                ret = ret + "Vitória - "
+            elif match['win'] == 0:
+                ret = ret + "Derrota - "
+            else:
+                ret = ret + "Empate - "
             ret = ret + str(match['score']) + " Pontos.\n"
         return ret
 
@@ -228,15 +233,16 @@ class BlackJackGame:
             if player.busted():
                 score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score 
             if player.name == "Banca":
-                score = " ??" if not audible else " está com "
+                score = " ?? " if not audible else " está com "
             resp = resp + player.name + score + (" Pontos. Suas cartas são " if player.name != 'Banca' else "") + player.show_hand(text=True, mock=True, audible=audible) + '\n'
         resp = resp + "Mais uma carta ou parar?"
         self.evaluated = False
         
         if self.get_current_player().has_blackjack():
             self.dealers_turn(audible)
-            
-        return resp, self.table(mock=True)
+            return self.evaluate(audible=audible)
+        else:
+            return resp, self.table(mock=True, text=None)
 
     def get_current_player(self):
         return self.players[self._current_player]
@@ -251,10 +257,12 @@ class BlackJackGame:
             if player.busted() or player.has_21():
                 player.turn_over = True
                 self._current_player = 0
-                resp = self.dealers_turn(audible)
+                self.dealers_turn(audible)
+                return self.evaluate(audible)
             else:
-                resp = "Seu Turno: \n"
+                resp = "Seu Turno: \n\n"
                 for player in self.players:
+
                     score = " " + str(player.get_game_score()) if not audible else " está com " + str(player.get_game_score())
                     if player.has_blackjack() :
                         score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
@@ -265,6 +273,7 @@ class BlackJackGame:
                     resp = resp + player.name + score + (" Pontos. " if player.name != 'Banca' else "") + player.show_hand(text=True, mock=True, audible=audible) + '\n'
         resp = resp + "Mais uma carta ou parar?"
         return resp, self.table(mock = True)
+
 
     def dealers_turn(self, audible):
         if not self.running:
@@ -287,6 +296,7 @@ class BlackJackGame:
         self.running = False
         
         return resp + "\n\n" + self.players[1].stats(audible) + "\n\nJôgo parado. Peça para jogar novamente."
+
 
     def stop(self):
         """
@@ -327,7 +337,7 @@ class BlackJackGame:
                     if not self.evaluated:
                         player.win += 1
                         player.matches.append({"win": 1, "score": player.get_game_score() })
-                    bj = "<b>Blackjac</b> - " if player.has_blackjack() else ""
+                    bj = "<b>Blackjack</b> - " if player.has_blackjack() else ""
                     ret =  f'Empatou com {bj}{player.get_game_score()} pontos!'
                 else:
                     if not self.evaluated: player.matches.append({"win": 0, "score": player.get_game_score() })
@@ -354,7 +364,7 @@ class BlackJackGame:
 
         ret = ret + '\n\n' + self.players[1].stats(audible) +  "\n\nJôgo parado. Peça para jogar novamente."
         self.evaluated = True
-        return ret, self.table()
+        return "Fim da partida. Peça para jogar novamente.", self.table(text=ret)
 
     def terminate (self):
         #return to same state as a new instance of BlackJackGame
@@ -369,21 +379,29 @@ class BlackJackGame:
         self.players.append(Player("Você"))
         self.deck = Deck()
 
-    def table(self, mock = False):
+    def table(self, mock = False, text = None):
         imgs_loader = [player.show_hand(mock=mock) for player in self.players]
-        fig = plt.figure(figsize=(len(imgs_loader)+1, 5))
+        size = len(imgs_loader) if not text else len(imgs_loader)+1
+        max_hand_count = min(max([len(player.hand) for player in self.players]), 4)
+        fig = plt.figure(figsize=(max_hand_count, max_hand_count*size*0.65))
         for idx in range(len(imgs_loader)):
-            ax = fig.add_subplot(len(imgs_loader), 1, idx+1, xticks=[], yticks=[])
+            ax = fig.add_subplot(size, 1, idx+1, xticks=[], yticks=[])
             ax.axis('off')
-            plt.imshow(Image.open(imgs_loader[idx]))
-        fig.suptitle('Cartas na Mesa:')
+            plt.imshow(Image.open(imgs_loader[idx]), aspect='auto')
+        # fig.suptitle('Cartas na Mesa:')
+        if text:
+          props = dict(boxstyle='round', facecolor='green', alpha=0.2)
+          ax = fig.add_subplot(size, 1, size)
+          # place a text box in upper left in axes coords
+          ax.text(0.5, 0.5, text, transform=ax.transAxes, fontsize=14,
+                  verticalalignment='center', horizontalalignment='center', bbox=props)
+          ax.axis('off')
         plt.tight_layout()
         buf = io.BytesIO()
-        fig.savefig(buf, format='png')
+        fig.savefig(buf, format='png', dpi=75)
         plt.close()
         buf.seek(0)
         ret = base64.b64encode(buf.read()).decode('utf-8')
-
         return ret
 
 def generate_bar_chart(win_percentage):

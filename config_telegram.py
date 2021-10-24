@@ -9,9 +9,13 @@ import assistant
 import voice
 import os
 import logging
-from pyngrok import ngrok
 import base64
 from game import BlackJackGame, FixSizeOrderedDict
+
+try:
+    from pyngrok import ngrok
+except ImportError:
+    pass
 
 from collections import OrderedDict
 
@@ -21,6 +25,7 @@ PORT = int(os.environ.get('PORT', '8443'))
 WEBHOOK_URL = os.environ.get('TELEGRAM_WEBHOOK')
 
 if not WEBHOOK_URL:
+
     http_tunnel = ngrok.connect(PORT, bind_tls=True)
     WEBHOOK_URL = http_tunnel.public_url
 
@@ -74,7 +79,8 @@ def start(update, context):
     assistant.validate_session(update.effective_chat.id)
     games[update.effective_chat.id] = BlackJackGame()
     response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), '', games[update.effective_chat.id])
-    context.bot.send_message(chat_id=update.effective_chat.id, text=response_text['text'])
+    if 'text' in response_text:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=response_text['text'])
     if 'img' in response_text:
         context.bot.send_photo(chat_id=update.effective_chat.id, photo=response_text['img'])
 
@@ -88,17 +94,19 @@ def message(update, context):
 
     response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), update.message.text, games[update.effective_chat.id])
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text=response_text['text'], parse_mode=telegram.ParseMode.HTML)
+    if 'text' in response_text:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=response_text['text'], parse_mode=telegram.ParseMode.HTML)
     if 'img' in response_text:
         context.bot.send_photo(chat_id=update.effective_chat.id, photo=base64.b64decode(response_text['img']))
 
 def receive_voice(update, context):
     assistant.validate_session(update.effective_chat.id)
-
     audio_file = BytesIO(update.message.voice.get_file().download_as_bytearray())
     text = voice.convert_voice(audio_file)
     response_text = assistant.send_message(SessionManager.getInstance().getSession(update.effective_chat.id), text, games[update.effective_chat.id], audible=True)
-
-    context.bot.send_voice(chat_id=update.effective_chat.id, voice=voice.convert_text(response_text['text']))
+    try:
+        context.bot.send_voice(chat_id=update.effective_chat.id, voice=voice.convert_text(response_text['text']))
+    except:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=response_text['text'], parse_mode=telegram.ParseMode.HTML)
 
 
