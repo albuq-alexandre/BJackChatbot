@@ -21,7 +21,7 @@ Single Blackjack Telegram Chatbot School Project using IBM Cloud
   
 ###  Disciplina 
 
-> *P8902-IANA-Computação Cognitiva 2 - Interface do usuário baseada em voz*  
+> *P8902-IANA-Chatbot*  
 >**Professor**: Rafael Brasileiro de Araujo  
 ###  Alunos  
 >- **Alexandre de Sousa Albuquerque**
@@ -54,7 +54,7 @@ A seguir as variáveis que devem ser configuradas no Heroku, ou no ambiente loca
 
 ## Help
 
-Utilize linguagem natural, via texto ou áudio para usar uma das funcionalidades:
+Utilize linguagem natural, via texto ou áudio para usar uma das funcionalidades. Use a palavra ***Menu*** pra ver:
 
 - **Iniciar:** Inicia o  Jogo ***BlackJack!***;
   - **Mais uma:** durante o jogo, para receber uma carta;
@@ -65,7 +65,7 @@ Utilize linguagem natural, via texto ou áudio para usar uma das funcionalidades
 - **Encerrar:** Quando estiver perdido, diga ***Tchau*** que a gente começa de novo!</i>
 
 
-##Créditos adicionais para os projetos:
+## Créditos adicionais para os projetos:
 * https://github.com/crobertsbmw/deckofcards
 * https://github.com/rafaelbr/MovieBot
 * https://github.com/d-Rickyy-b/Python-BlackJackBot
