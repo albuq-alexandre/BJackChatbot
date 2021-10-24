@@ -169,12 +169,15 @@ class Player:
     def has_21(self):
         return self.get_game_score() == 21
 
+
     def stats(self, audible=False):
+
         if len(self.matches) > 0:
             win_percent = self.win/len(self.matches)
             bar = generate_bar_chart(win_percent*100)
             if audible:
-                template = 'Estatísticas para {}:\n\nEle jogou {} partidas e obteve {}\n vitórias. O percentual de vitórias é {:.2%}'
+                template = 'Estatísticas do jogador.\n{}.\nQuantidade de Jogos: {}.\nNúmero de Vitórias: {}.\nPorcentagem de vitórias: {} por cento.'
+
                 template = template.format(self.name.strip(), len(self.matches), self.win, int(win_percent*100))
             else:
                 template = 'Estatísticas do jogador <b>{}</b> 📊:\n\n<b>Jogos:</b> {}\n<b>Vitórias:</b> {}\n\n{}\n\n<b>Porcentagem de vitórias:</b> {:.2%}\n'
@@ -266,6 +269,11 @@ class BlackJackGame:
                     score = ": " + str(player.get_game_score()) if not audible else " está com " + str(player.get_game_score())
                     if player.name == "Banca":
                         score = " ??" if not audible else " está com "
+                    else:
+                        if player.has_blackjack() :
+                            score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
+                        if player.busted():
+                            score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score 
                     if audible:
                         resp = resp + player.name + score + (" Pontos. " if player.name != 'Banca' else "") + player.show_hand(text=True, mock=True, audible=audible) + '\n'
                     else:
@@ -351,7 +359,6 @@ class BlackJackGame:
             for player in list_busted:
                     if not self.evaluated: player.matches.append({"win": 0, "score": player.get_game_score() })
                     ret = f'Você estourou e perdeu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos.'
-
 
         self.evaluated = True
         return "Fim da partida. Peça para jogar novamente.", self.table(text=ret)
