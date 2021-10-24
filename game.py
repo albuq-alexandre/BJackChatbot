@@ -103,7 +103,7 @@ class Player:
         if card == 'J':
             return 'Valete'
         elif card == 'Q':
-            return 'Dâma'
+            return 'Dãma'
         elif card == 'K':
             return 'Rei'
         else:
@@ -173,13 +173,12 @@ class Player:
         if len(self.matches) > 0:
             win_percent = self.win/len(self.matches)
             bar = generate_bar_chart(win_percent*100)
-            if not audible:
+            if audible:
+                template = 'Estatísticas do jogador.\n{}.\nQuantidade de Jogos: {}.\nNúmero de Vitórias: {}.\nPorcentagem de vitórias: {} por cento.'
+                template = template.format(self.name.strip(), len(self.matches), self.win, int(win_percent*100))
+            else:
                 template = 'Estatísticas do jogador <b>{}</b> 📊:\n\n<b>Jogos:</b> {}\n<b>Vitórias:</b> {}\n\n{}\n\n<b>Porcentagem de vitórias:</b> {:.2%}\n'
                 template = template.format(self.name, len(self.matches), self.win, bar, win_percent)
-            else:
-                template = 'Estatísticas para {}:\n\nEle jogou {} partidas e obteve {}\n vitórias. O percentual de vitórias é {:.2%}'
-                template = template.format(self.name, len(self.matches), self.win, win_percent)
-
             return template
         else:
             return "Sem estatísticas. \nNenhuma partida concluída."
@@ -228,7 +227,7 @@ class BlackJackGame:
         self._current_player = 1
         resp = "Cartas na mesa: \n"
         for player in self.players:
-            score = " " + str(player.get_game_score()) if not audible else " Está com " + str(player.get_game_score())
+            score = " " + str(player.get_game_score()) if not audible else " está com " + str(player.get_game_score())
             if player.has_blackjack() :
                 score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
             if player.busted():
@@ -263,23 +262,18 @@ class BlackJackGame:
             else:
                 resp = "Seu Turno: \n\n"
                 for player in self.players:
-                    score = ": " + str(player.get_game_score()) if not audible else " Está com " + str(player.get_game_score())
-                    # if player.has_blackjack() :
-                    #     score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
-                    # if player.busted():
-                    #     score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score
+
+                    score = " " + str(player.get_game_score()) if not audible else " está com " + str(player.get_game_score())
+                    if player.has_blackjack() :
+                        score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
+                    if player.busted():
+                        score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score 
                     if player.name == "Banca":
-                        score = " ??" if not audible else ""
-                    if audible:
-                        resp = resp + player.name + score + (" Pontos. " if player.name != 'Banca' else "") + player.show_hand(text=True, mock=True, audible=audible) + '\n'
-                    else:
-                        resp = resp + player.name + score + (" Pontos. " if player.name != 'Banca' else "") + '\n\n'
-        # if player.has_blackjack():
-        #     self.dealers_turn()
-        #     return self.evaluate(audible=audible)
-        # else:
-                resp = resp + "Mais uma carta ou parar?"
-            return resp, self.table(mock = True, text=None)
+                        score = " ??" if not audible else " está com "
+                    resp = resp + player.name + score + (" Pontos. " if player.name != 'Banca' else "") + player.show_hand(text=True, mock=True, audible=audible) + '\n'
+        resp = resp + "Mais uma carta ou parar?"
+        return resp, self.table(mock = True)
+
 
     def dealers_turn(self, audible):
         if not self.running:
@@ -290,18 +284,19 @@ class BlackJackGame:
             self.dealer.draw_from_deck(self.deck)
 
         self.dealer.turn_over = True
-        # resp = "Turno da Banca: \n"
-        # for player in self.players:
-        #     score = " " + str(player.get_game_score()) if not audible else " Está com " + str(player.get_game_score())
-        #     if player.has_blackjack() :
-        #         score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
-        #     if player.busted():
-        #         score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score
-        #     resp = resp + player.name + score + " Pontos. " + player.show_hand(text=True, audible=audible) + '\n'
-        self.evaluate(audible=audible)
+        resp = "Turno da Banca: \n"
+        for player in self.players:
+            score = " " + str(player.get_game_score()) if not audible else " está com " + str(player.get_game_score())
+            if player.has_blackjack() :
+                score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
+            if player.busted():
+                score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score
+            resp = resp + player.name + score + " Pontos. " + player.show_hand(text=True, audible=audible) + '\n'
+        self.evaluate(audible)
         self.running = False
         
-        # return resp + "\n\n" + self.players[1].stats() + "\n\nJogo Parado. Peça para jogar novamente."
+        return resp + "\n\n" + self.players[1].stats(audible) + "\n\nJôgo parado. Peça para jogar novamente."
+
 
     def stop(self):
         """
@@ -334,7 +329,7 @@ class BlackJackGame:
                 if not self.evaluated:
                     player.win += 1
                     player.matches.append({"win": 1, "score": player.get_game_score() })
-                ret = f'Vencedor foi você!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos. Estourou!'
+                ret = f'O Vencedor foi você!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos. Estourou!'
 
         elif self.dealer.has_blackjack():
             for player in list_not_busted:
@@ -354,7 +349,7 @@ class BlackJackGame:
                         player.win += 1
                         player.matches.append({"win": 1, "score": player.get_game_score() })
                     bj = "<b>Blackjack</b> - " if player.has_blackjack() else ""
-                    ret = f'Vencedor foi você!\nVocê: {bj}{player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos.'
+                    ret = f'O Vencedor foi você!\nVocê: {bj}{player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos.'
                 elif player.get_game_score() == self.dealer.get_game_score():
                     if not self.evaluated:
                         player.matches.append({"win": 1, "score": player.get_game_score() })
@@ -367,7 +362,7 @@ class BlackJackGame:
                     if not self.evaluated: player.matches.append({"win": 0, "score": player.get_game_score() })
                     ret = f'Você estourou e perdeu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos.'
 
-        # ret = ret + "\n\nJogo Parado. Peça para jogar novamente."
+        ret = ret + '\n\n' + self.players[1].stats(audible) +  "\n\nJôgo parado. Peça para jogar novamente."
         self.evaluated = True
         return "Fim da partida. Peça para jogar novamente.", self.table(text=ret)
 
