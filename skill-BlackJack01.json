@@ -1,6 +1,21 @@
 {
   "intents": [
     {
+      "intent": "creditos",
+      "examples": [
+        {
+          "text": "créditos"
+        },
+        {
+          "text": "quem fez vc"
+        },
+        {
+          "text": "quem fez você?"
+        }
+      ],
+      "description": "Informa os créditos do projeto"
+    },
+    {
       "intent": "estatisticas",
       "examples": [
         {
@@ -113,6 +128,12 @@
         },
         {
           "text": "o que eu joguei"
+        },
+        {
+          "text": "partida"
+        },
+        {
+          "text": "partidas"
         }
       ],
       "description": "listar partidas"
@@ -362,7 +383,7 @@
       },
       "conditions": "#iniciar",
       "dialog_node": "node_1_1633891198603",
-      "previous_sibling": "node_5_1634507233780",
+      "previous_sibling": "node_8_1635055169077",
       "disambiguation_opt_out": true
     },
     {
@@ -559,7 +580,7 @@
           {
             "values": [
               {
-                "text": "Eu sou um Chatbot feito pelo Grupo do Alexandre, Celso e Juliano. \nOlha só o que eu posso fazer:\n\n<i><b>    - Iniciar:</b> Inicia o  Jogo <b><u>BlackJack!</u></b>;\n<b>        - Mais uma: </b> durante o jogo, para receber uma carta;\n<b>        - Parar: </b> para finalizar seu turno.\n<b>    - Listar: </b>Lista suas partidas de BlackJack no jogo atual;\n<b>    - Estatistica: </b>Mostra seu percentual de vitórias;\n<b>    - Encerrar: </b>Quando estiver perdido, diga <b><u>Tchau</u></b> que a gente começa de novo!</i>\n\nEu entendo linguagem natural e áudio, então você pode me dizer o que você quer fazer de várias formas. \n\n<b>Vamos jogar BlackJack?</b>\n"
+                "text": "Eu sou um Chatbot feito pelo Grupo do Alexandre, Celso e Juliano. \nOlha só o que eu posso fazer:\n\n<i><b>    - Iniciar:</b> Inicia o  Jogo <b><u>BlackJack!</u></b>;\n<b>        - Mais uma: </b> durante o jogo, para receber uma carta;\n<b>        - Parar: </b> para finalizar seu turno.\n<b>    - Listar: </b>Lista suas partidas de BlackJack no jogo atual;\n<b>    - Estatística: </b>Mostra seu percentual de vitórias;\n<b>    - Créditos: </b>Mostra os créditos do projeto;\n<b>    - Encerrar: </b>Quando estiver perdido, diga <b><u>Tchau</u></b> que a gente começa de novo!</i>\n\nEu entendo linguagem natural e áudio, então você pode me dizer o que você quer fazer de várias formas. \n\n<b>Vamos jogar BlackJack?</b>\n"
               }
             ],
             "response_type": "text",
@@ -637,6 +658,26 @@
       "dialog_node": "node_7_1634092247414",
       "previous_sibling": "node_3_1634168515135",
       "disambiguation_opt_out": true
+    },
+    {
+      "type": "standard",
+      "title": "Créditos",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Eu sou um Chatbot feito pelo Grupo do Alexandre, Celso e Juliano. \n\nUso o telegram, o IBM Watson e o deckofcardsapi.com para funcionar. Fui escrito em Python e estou hospedado no Heroku. \n\nMeu código fonte está no GitHub: \nhttps://github.com/albuq-alexandre/BJackChatbot\n\nPasse lá e dê uma estrela!\n\nCréditos adicionais para os projetos:\nhttps://github.com/crobertsbmw/deckofcards\nhttps://github.com/rafaelbr/MovieBot\nhttps://github.com/d-Rickyy-b/Python-BlackJackBot\nhttps://github.com/python-telegram-bot/python-telegram-bot"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "#creditos",
+      "dialog_node": "node_8_1635055169077",
+      "previous_sibling": "node_5_1634507233780"
     },
     {
       "type": "standard",
@@ -736,7 +777,7 @@
           {
             "values": [
               {
-                "text": "O jogo parece não estar iniciado, ou demoramos muito e eu desisti da partida.\nNão consigo dar cartas à você.\nVamos jogar uma nova partida de BlackJack?"
+                "text": "O jogo parece não estar iniciado, ou demoramos muito e eu desisti da partida. \nNão consigo dar cartas à você. \nVamos começar o jogo BlackJack novamente?"
               }
             ],
             "response_type": "text",
