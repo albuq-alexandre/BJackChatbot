@@ -373,6 +373,11 @@ class BlackJackGame:
         imgs_loader = [player.show_hand(mock=mock) for player in self.players]
         size = len(imgs_loader) if not text else len(imgs_loader)+1
         max_hand_count = min(max([len(player.hand) for player in self.players]), 4)
+        if max_hand_count < 3:
+            dpi = 100
+        else:
+            dpi = 75
+
         fig = plt.figure(figsize=(max_hand_count, max_hand_count*size*0.65))
         for idx in range(len(imgs_loader)):
             ax = fig.add_subplot(size, 1, idx+1, xticks=[], yticks=[])
@@ -388,7 +393,7 @@ class BlackJackGame:
           ax.axis('off')
         plt.tight_layout()
         buf = io.BytesIO()
-        fig.savefig(buf, format='png', dpi=75)
+        fig.savefig(buf, format='png', dpi=dpi)
         plt.close()
         buf.seek(0)
         ret = base64.b64encode(buf.read()).decode('utf-8')
