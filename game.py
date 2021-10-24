@@ -230,11 +230,12 @@ class BlackJackGame:
             score = " " + str(player.get_game_score()) if not audible else " está com " + str(player.get_game_score())
             if player.has_blackjack() :
                 score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
-            if player.busted():
-                score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score 
             if player.name == "Banca":
                 score = " ?? " if not audible else " está com "
-            resp = resp + player.name + score + (" Pontos. Suas cartas são " if player.name != 'Banca' else "") + player.show_hand(text=True, mock=True, audible=audible) + '\n'
+            if audible:
+                resp = resp + player.name + score + (" Pontos. Suas cartas são " if player.name != 'Banca' else "") + player.show_hand(text=True, mock=True, audible=audible) + '\n'
+            else:
+                resp = resp + player.name + score + (" Pontos. " if player.name != 'Banca' else "") + '\n\n'
         resp = resp + "Mais uma carta ou parar?"
         self.evaluated = False
         
@@ -282,18 +283,9 @@ class BlackJackGame:
             self.dealer.draw_from_deck(self.deck)
 
         self.dealer.turn_over = True
-        # resp = "Turno da Banca: \n"
-        # for player in self.players:
-        #     score = " " + str(player.get_game_score()) if not audible else " está com " + str(player.get_game_score())
-        #     if player.has_blackjack() :
-        #         score = "<b>BlackJack! </b>" + score if not audible else "BlequeJeque!" + score
-        #     if player.busted():
-        #         score = "<b>Estourou! </b>" + score if not audible else "Estourou com " + score
-        #     resp = resp + player.name + score + " Pontos. " + player.show_hand(text=True, audible=audible) + '\n'
         self.evaluate(audible)
         self.running = False
-        
-        # return resp + "\n\n" + self.players[1].stats(audible) + "\n\nJôgo parado. Peça para jogar novamente."
+
 
 
     def stop(self):
@@ -360,7 +352,7 @@ class BlackJackGame:
                     if not self.evaluated: player.matches.append({"win": 0, "score": player.get_game_score() })
                     ret = f'Você estourou e perdeu!\nVocê: {player.get_game_score()} pontos.\nBanca: {self.dealer.get_game_score()} pontos.'
 
-        # ret = ret + '\n\n' + self.players[1].stats(audible) +  "\n\nJôgo parado. Peça para jogar novamente."
+
         self.evaluated = True
         return "Fim da partida. Peça para jogar novamente.", self.table(text=ret)
 
