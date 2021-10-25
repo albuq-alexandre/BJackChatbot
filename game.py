@@ -351,6 +351,7 @@ class BlackJackGame:
                         player.win += 1
                         player.matches.append({"win": 2, "score": player.get_game_score() })
                         self.dealer.matches.append({"win": 2, "score": self.dealer.get_game_score() })
+                        self.dealer.win += 1
                     if audible:
                         bj = "Bleque jeck! - " if player.has_blackjack() else ""
                         ret = f'Empataram com {bj}. {player.get_game_score()} pontos!'
@@ -362,6 +363,8 @@ class BlackJackGame:
                         if not self.evaluated:
                             player.matches.append({"win": 2, "score": player.get_game_score() })
                             self.dealer.matches.append({"win": 2, "score": self.dealer.get_game_score() })
+                            player.win += 1
+                            self.dealer.win += 1
                         if audible:
                             ret = f'Você empatou com a banca com {player.get_game_score()} pontos. A Banca fez Bleque Jeck! com 21 pontos.'
                         else:
@@ -370,6 +373,7 @@ class BlackJackGame:
                         if not self.evaluated:
                             player.matches.append({"win": 0, "score": player.get_game_score() })
                             self.dealer.matches.append({"win": 1, "score": self.dealer.get_game_score() })
+                            self.dealer.win += 1
                         if audible:
                             ret = f'Você perdeu com {player.get_game_score()} pontos. A Banca fez Bleque Jeck! com 21 pontos.'
                         else:
@@ -378,6 +382,7 @@ class BlackJackGame:
                 if not self.evaluated:
                     player.matches.append({"win": 0, "score": player.get_game_score() })
                     self.dealer.matches.append({"win": 1, "score": self.dealer.get_game_score() })
+                    self.dealer.win += 1
                 if audible:
                     ret = f'Você estourou e perdeu com {player.get_game_score()} pontos. A Banca fez {self.dealer.get_game_score()} = BlackJack!'
                 else:
@@ -401,6 +406,7 @@ class BlackJackGame:
                         player.matches.append({"win": 2, "score": player.get_game_score() })
                         self.dealer.matches.append({"win": 2, "score": self.dealer.get_game_score() })
                         player.win += 1
+                        self.dealer.win += 1
                     if audible:
                         ret = f'Você e a Banca empataram com\n {player.get_game_score()} pontos!'
                     else:
@@ -409,6 +415,7 @@ class BlackJackGame:
                     if not self.evaluated:
                         player.matches.append({"win": 0, "score": player.get_game_score() })
                         self.dealer.matches.append({"win": 1, "score": self.dealer.get_game_score() })
+                        self.dealer.win += 1
                     if audible:
                         ret = f'Você perdeu com {player.get_game_score()} pontos. A Banca venceu com {self.dealer.get_game_score()} pontos.'
                     else:
@@ -417,6 +424,7 @@ class BlackJackGame:
                     if not self.evaluated:
                         player.matches.append({"win": 0, "score": player.get_game_score() })
                         self.dealer.matches.append({"win": 1, "score": self.dealer.get_game_score() })
+                        self.dealer.win += 1
                     if audible:
                         ret = f'Você estourou e perdeu com {player.get_game_score()} pontos. A banca venceu com {self.dealer.get_game_score()} pontos.'
                     else:
