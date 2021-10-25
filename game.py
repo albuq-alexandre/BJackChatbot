@@ -176,11 +176,11 @@ class Player:
             win_percent = self.win/len(self.matches)
             bar = generate_bar_chart(win_percent*100)
             if audible:
-                template = 'Estatísticas do jogador.\n{}.\nQuantidade de Jogos: {}.\nNúmero de Vitórias: {}.\nPorcentagem de vitórias: {} por cento.'
+                template = 'Estatísticas do jogador.\n{}.\nQuantidade de Jogos: {}.\nNúmero de Vitórias ou empates: {}.\nPorcentagem de vitórias: {} por cento.'
 
                 template = template.format(self.name.strip(), len(self.matches), self.win, int(win_percent*100))
             else:
-                template = 'Estatísticas do jogador <b>{}</b> 📊:\n\n<b>Jogos:</b> {}\n<b>Vitórias:</b> {}\n\n{}\n\n<b>Porcentagem de vitórias:</b> {:.2%}\n'
+                template = 'Estatísticas do jogador <b>{}</b> 📊:\n\n<b>Jogos:</b> {}\n<b>Vitórias/Empates:</b> {}\n\n{}\n\n<b>Porcentagem de vitórias:</b> {:.2%}\n'
                 template = template.format(self.name, len(self.matches), self.win, bar, win_percent)
             return template
         else:
@@ -356,7 +356,7 @@ class BlackJackGame:
                         bj = "Bleque jeck! - " if player.has_blackjack() else ""
                         ret = f'Empataram com {bj}. {player.get_game_score()} pontos!'
                     else:
-                        bj = "Blackjack Duplo!\n" if player.has_blackjack() else ""
+                        bj = "\nBlackjack Duplo!\n" if player.has_blackjack() else ""
                         ret = f'Empatou com {bj}{player.get_game_score()} pontos!'
                 else:
                     if player.get_game_score()==21:
