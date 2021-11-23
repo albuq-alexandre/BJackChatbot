@@ -151,6 +151,9 @@
           "text": "Opções"
         },
         {
+          "text": "o que vc faz"
+        },
+        {
           "text": "O que você faz"
         },
         {
@@ -209,6 +212,38 @@
         }
       ],
       "description": "Pega mais 1 carta do Baralho"
+    },
+    {
+      "intent": "saudacao",
+      "examples": [
+        {
+          "text": "?"
+        },
+        {
+          "text": "Boa Noite"
+        },
+        {
+          "text": "Boa Tarde"
+        },
+        {
+          "text": "Bom dia"
+        },
+        {
+          "text": "Como vai você?"
+        },
+        {
+          "text": "está on?"
+        },
+        {
+          "text": "Olá"
+        },
+        {
+          "text": "Tá aí"
+        },
+        {
+          "text": "Tudo bem?"
+        }
+      ]
     }
   ],
   "entities": [],
@@ -234,17 +269,18 @@
           {
             "values": [
               {
-                "text": "Bora jogar BlackJack?"
+                "text": "Olá, eu sou um Chatbot que joga cartas.\nMeu jogo preferido é o \"21\" ou Blackjack.\nBora jogar BlackJack?"
               }
             ],
             "response_type": "text",
-            "selection_policy": "sequential"
+            "selection_policy": "multiline"
           }
         ]
       },
       "context": {},
-      "conditions": "welcome",
-      "dialog_node": "Bem-vindo"
+      "conditions": "#saudacao",
+      "dialog_node": "Bem-vindo",
+      "disambiguation_opt_out": true
     },
     {
       "type": "standard",
@@ -686,11 +722,14 @@
           {
             "values": [
               {
-                "text": "$resposta.text"
+                "text": "$resposta.text\n\nEsse foi um resumo do nosso jogo. \nFoi ótimo falar com você! Até breve!\nLembre-se, estou aqui prontinho pra jogar novamente!"
+              },
+              {
+                "text": "Até logo!\nVou resumir nossa partida até agora:\n\n$resposta.text\n\nAdorei iteragir com você! Até o próximo jogo!\nPode me chamar sempre que quiser jogar Blackjack.\nCarpe diem!"
               }
             ],
             "response_type": "text",
-            "selection_policy": "sequential"
+            "selection_policy": "random"
           }
         ]
       },
@@ -983,6 +1022,9 @@
     }
   ],
   "counterexamples": [
+    {
+      "text": "eu sou seu pai"
+    },
     {
       "text": "o que vc faz"
     }
